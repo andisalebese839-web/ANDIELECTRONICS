@@ -122,10 +122,10 @@
         <option value="delivery">Delivery</option>
       </select></label>
       <label id="deliveryAreaWrap">Delivery area<select name="delivery_area" id="deliveryArea">
-        <option value="local" data-fee="50">Local / Same City — R50</option>
-        <option value="same_province" data-fee="80">Same Province — R80</option>
-        <option value="other_province" data-fee="120">Other Province — R120</option>
-        <option value="remote" data-fee="150">Remote Area — R150</option>
+        <option value="within_5km" data-fee="75">Same Province — within 5 km (R70–R80)</option>
+        <option value="over_5km" data-fee="85">Same Province — more than 5 km (R80–R90)</option>
+        <option value="other_province" data-fee="150">Other Province — R150</option>
+        <option value="remote" data-fee="180">Remote Area — R180</option>
       </select></label>
       <label>Area / delivery address<input required name="customer_address" id="customerAddress" autocomplete="street-address" placeholder="Town, suburb or delivery address"></label>
       <label>Order option<select required name="service_option" id="serviceOption">
