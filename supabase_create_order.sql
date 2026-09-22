@@ -1,4 +1,25 @@
--- Secure public checkout function for ANDI ELECTRONICS
+-- ANDI ELECTRONICS: ADMIN SETUP
+-- Run this entire query once in Supabase SQL Editor.
+
+-- 1. Make the order-status constraint safe to recreate.
+alter table public.orders
+  drop constraint if exists orders_status_check;
+
+alter table public.orders
+  add constraint orders_status_check
+  check (
+    status in (
+      'Order received',
+      'Order accepted',
+      'Preparing order',
+      'Shipped',
+      'Out for delivery',
+      'Delivered',
+      'Order delivered'
+    )
+  );
+
+-- 2. Public checkout function.
 create or replace function public.create_order(order_data jsonb)
 returns table (
   order_number text,
@@ -71,25 +92,8 @@ $$;
 revoke all on function public.create_order(jsonb) from public;
 grant execute on function public.create_order(jsonb) to anon, authenticated;
 
--- Allow the admin dashboard to use the complete status workflow.
-alter table public.orders
-  drop constraint if exists orders_status_check;
-
-alter table public.orders
-  add constraint orders_status_check
-  check (
-    status in (
-      'Order received',
-      'Order accepted',
-      'Preparing order',
-      'Shipped',
-      'Out for delivery',
-      'Delivered',
-      'Order delivered'
-    )
-  );
-
--- Identify the site owner as the admin.
+-- 3. Admin check.
+-- Your website admin login must use this email.
 create or replace function public.is_admin()
 returns boolean
 language sql
@@ -100,17 +104,19 @@ as $$
   select coalesce(auth.jwt()->>'email','') = 'andisalebese839@gmail.com';
 $$;
 
--- Replace the old broad authenticated-user policies.
+-- 4. Remove old order policies so they cannot conflict.
 drop policy if exists "Admins can view orders" on public.orders;
 drop policy if exists "Admins can update orders" on public.orders;
 drop policy if exists "Admins can insert orders" on public.orders;
 
+-- 5. Only the authenticated admin can read orders.
 create policy "Admins can view orders"
 on public.orders
 for select
 to authenticated
 using (public.is_admin());
 
+-- 6. Only the authenticated admin can change order status.
 create policy "Admins can update orders"
 on public.orders
 for update
@@ -118,5 +124,9 @@ to authenticated
 using (public.is_admin())
 with check (public.is_admin());
 
--- Public customers create orders only through create_order().
--- No public INSERT policy is required.
+-- 7. Ensure RLS is enabled.
+alter table public.orders enable row level security;
+
+-- 8. Make sure the public checkout RPC is callable.
+grant execute on function public.create_order(jsonb) to anon;
+grant execute on function public.create_order(jsonb) to authenticated;
