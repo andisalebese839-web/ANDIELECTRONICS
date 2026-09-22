@@ -103,3 +103,6 @@ footer{background:#f3f9ff!important;border-top:1px solid #dfeefa!important;color
 .hero-type-bottom p{font-family:Inter,system-ui,sans-serif!important;color:#71839a!important}
 .hero-robot-photo,.hero-robot-image,.robot-core,.robot-face,.orbit,.node{display:none!important}
 @media(max-width:900px){.hero-type{min-height:420px!important;padding:32px!important}.hero-type-word{font-size:clamp(3.4rem,14vw,5.4rem)!important}}
+
+/* AE BRAND MONOGRAM */
+.brand{display:inline-flex!important;align-items:center!important;gap:10px!important;text-decoration:none!important}.brand-logo{width:42px!important;height:42px!important;display:block!important;flex:0 0 auto!important}.brand-name{display:inline-block!important;color:#17345c!important;letter-spacing:.06em!important;font-weight:800!important}.brand-name span{color:#1268e8!important}.hero-logo-mark{position:relative;z-index:2;width:108px;height:108px;margin:0 auto 6px;display:grid;place-items:center}.hero-logo-mark img{width:100%;height:100%;display:block;filter:drop-shadow(0 12px 22px rgba(18,104,232,.12))}@media(max-width:600px){.brand-logo{width:36px!important;height:36px!important}.brand-name{font-size:.92rem!important}.hero-logo-mark{width:88px;height:88px}}
