@@ -173,11 +173,23 @@ async function submitOrder(event){
     additional_instructions:form.elements.additional_instructions?.value||""
   };
   try{
-    const dbResponse=await fetch(SUPABASE_URL+"/rest/v1/rpc/create_order",{
-      method:"POST",headers:SUPABASE_HEADERS,
-      body:JSON.stringify({order_data:orderData})
-    });
-    if(!dbResponse.ok)throw new Error(await dbResponse.text()||"Database order creation failed");
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),15000);
+    let dbResponse;
+    try{
+      dbResponse=await fetch(SUPABASE_URL+"/rest/v1/rpc/create_order",{
+        method:"POST",
+        headers:SUPABASE_HEADERS,
+        body:JSON.stringify({order_data:orderData}),
+        signal:controller.signal
+      });
+    }finally{
+      clearTimeout(timeout);
+    }
+    if(!dbResponse.ok){
+      const dbError=await dbResponse.text();
+      throw new Error(dbError||"Database order creation failed");
+    }
 
     try{
       await fetch("https://formspree.io/f/mnpndglk",{
