@@ -75,9 +75,12 @@
         <a href="tel:+27793234998"><strong>☎ Phone / WhatsApp</strong><span>079 323 4998</span></a>
       </div>
     </div>
-    <form id="contactForm" class="contact-form">
-      <input required name="name" placeholder="Your name"><input required type="email" name="email" placeholder="Email address"><textarea required name="message" rows="5" placeholder="Tell us about your project"></textarea>
-      <button class="btn primary" type="submit">Send enquiry</button><small id="formStatus"></small>
+    <form id="contactForm" class="contact-form" action="https://formspree.io/f/mnpndglk" method="POST">
+      <input required name="name" placeholder="Your name">
+      <input required type="email" name="email" placeholder="Email address">
+      <textarea required name="message" rows="5" placeholder="Tell us about your project"></textarea>
+      <button class="btn primary" type="submit">Send enquiry</button>
+      <small id="formStatus"></small>
     </form>
   </div>
 </section>
