@@ -70,3 +70,23 @@ $$;
 
 revoke all on function public.create_order(jsonb) from public;
 grant execute on function public.create_order(jsonb) to anon, authenticated;
+
+
+-- Status workflow fix
+-- Allows the admin to move an order through the full customer-facing workflow.
+alter table public.orders
+  drop constraint if exists orders_status_check;
+
+alter table public.orders
+  add constraint orders_status_check
+  check (
+    status in (
+      'Order received',
+      'Order accepted',
+      'Preparing order',
+      'Shipped',
+      'Out for delivery',
+      'Delivered',
+      'Order delivered'
+    )
+  );
