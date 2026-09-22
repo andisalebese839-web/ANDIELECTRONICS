@@ -284,6 +284,60 @@ async function copyOrderNumber(orderNumber){
     showCheckoutStatus("Your order number is "+orderNumber+".","success");
   }
 }
+
+/* OWNER ORDER DASHBOARD */
+let ownerAccessToken=localStorage.getItem("andiOwnerAccessToken")||"";
+function openOwner(){$("#ownerModal").classList.add("open");$("#ownerModal").setAttribute("aria-hidden","false");if(ownerAccessToken)showOwnerDashboard()}
+function closeOwner(){$("#ownerModal").classList.remove("open");$("#ownerModal").setAttribute("aria-hidden","true")}
+function ownerMessage(message,type="info"){$("#ownerLoginMessage").textContent=message;$("#ownerLoginMessage").className="owner-message "+type}
+async function ownerLogin(){
+ const email=$("#ownerEmail").value.trim(),password=$("#ownerPassword").value;
+ if(!email||!password){ownerMessage("Enter your owner email and password.","error");return}
+ $("#ownerLoginBtn").disabled=true;$("#ownerLoginBtn").textContent="Signing in...";ownerMessage("Checking your owner account...","info");
+ try{
+  const response=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"apikey":SUPABASE_PUBLISHABLE_KEY,"Content-Type":"application/json"},body:JSON.stringify({email,password})});
+  const data=await response.json();if(!response.ok||!data.access_token)throw new Error(data.error_description||data.msg||"Owner sign-in failed.");
+  ownerAccessToken=data.access_token;localStorage.setItem("andiOwnerAccessToken",ownerAccessToken);ownerMessage("Signed in successfully.","success");showOwnerDashboard();
+ }catch(error){console.error(error);ownerAccessToken="";localStorage.removeItem("andiOwnerAccessToken");ownerMessage(error.message||"Could not sign in.","error")}
+ finally{$("#ownerLoginBtn").disabled=false;$("#ownerLoginBtn").textContent="Sign in"}
+}
+function ownerHeaders(){return {"apikey":SUPABASE_PUBLISHABLE_KEY,"Authorization":"Bearer "+ownerAccessToken,"Content-Type":"application/json","Accept":"application/json"}}
+function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char]))}
+async function loadOwnerOrders(){
+ if(!ownerAccessToken)return;
+ $("#ownerOrders").innerHTML="<div class='empty'>Loading customer orders...</div>";
+ try{
+  const response=await fetch(SUPABASE_URL+"/rest/v1/orders?select=*&order=created_at.desc",{headers:ownerHeaders()});
+  if(response.status===401){ownerLogout();throw new Error("Your owner session has expired. Please sign in again.")}
+  if(!response.ok){const message=await response.text();throw new Error(message||"Could not load orders.")}
+  const orders=await response.json();$("#ownerOrderCount").textContent=" • "+orders.length+" order"+(orders.length===1?"":"s");
+  if(!orders.length){$("#ownerOrders").innerHTML="<div class='empty'>No customer orders yet.</div>";return}
+  $("#ownerOrders").innerHTML=orders.map(order=>{
+   const items=Array.isArray(order.products)?order.products:[],itemText=items.map(item=>item.name+" × "+item.qty).join(" • ")||"Order details unavailable",status=order.status||"Order received";
+   return `<article class="owner-order"><div class="owner-order-head"><div><strong>${escapeHtml(order.order_number||"Order")}</strong><small>${new Date(order.created_at||Date.now()).toLocaleString()}</small></div><strong>${money(order.order_total||0)}</strong></div>
+   <div class="owner-grid"><div><small>Customer</small><strong>${escapeHtml(order.customer_name||"—")}</strong></div><div><small>Phone</small><strong>${escapeHtml(order.customer_phone||"—")}</strong></div><div><small>Fulfilment</small><strong>${escapeHtml(order.fulfilment||"—")}</strong></div><div><small>Email</small><strong>${escapeHtml(order.customer_email||"—")}</strong></div><div><small>Items</small><strong>${escapeHtml(itemText)}</strong></div><div><small>Area</small><strong>${escapeHtml(order.delivery_area||"Collection")}</strong></div></div>
+   <div class="owner-status"><label><strong>Order status</strong></label><select data-order-number="${escapeHtml(order.order_number||"")}" class="owner-status-select">${["Order received","Order accepted","Preparing order","Shipped","Out for delivery","Order delivered"].map(x=>`<option ${x===status?"selected":""}>${x}</option>`).join("")}</select><button type="button" class="small-btn owner-save-status" data-order-number="${escapeHtml(order.order_number||"")}">Update status</button></div></article>`;
+  }).join("");
+  document.querySelectorAll(".owner-save-status").forEach(button=>button.onclick=()=>updateOwnerOrderStatus(button.dataset.orderNumber));
+ }catch(error){console.error(error);$("#ownerOrders").innerHTML=`<div class="owner-message error">${escapeHtml(error.message||"Could not load orders.")}</div>`}
+}
+async function updateOwnerOrderStatus(orderNumber){
+ const select=document.querySelector(".owner-status-select[data-order-number='"+CSS.escape(orderNumber)+"']");if(!select)return;
+ try{
+  const status=select.value,response=await fetch(SUPABASE_URL+"/rest/v1/orders?order_number=eq."+encodeURIComponent(orderNumber),{method:"PATCH",headers:{...ownerHeaders(),"Prefer":"return=minimal"},body:JSON.stringify({status,updated_at:new Date().toISOString()})});
+  if(response.status===401){ownerLogout();throw new Error("Your owner session has expired. Please sign in again.")}
+  if(!response.ok){const message=await response.text();throw new Error(message||"Could not update order status.")}
+  $("#ownerMessage").textContent=orderNumber+" updated to "+status+".";$("#ownerMessage").className="owner-message success";
+ }catch(error){console.error(error);$("#ownerMessage").textContent=error.message||"Could not update order status.";$("#ownerMessage").className="owner-message error"}
+}
+function showOwnerDashboard(){$("#ownerLogin").hidden=true;$("#ownerDashboard").hidden=false;loadOwnerOrders()}
+function ownerLogout(){ownerAccessToken="";localStorage.removeItem("andiOwnerAccessToken");$("#ownerDashboard").hidden=true;$("#ownerLogin").hidden=false;$("#ownerPassword").value="";$("#ownerLoginMessage").textContent=""}
+
+$("#ownerLoginBtn").onclick=ownerLogin;
+$("#closeOwner").onclick=closeOwner;
+$("#ownerRefresh").onclick=loadOwnerOrders;
+$("#ownerLogout").onclick=ownerLogout;
+document.addEventListener("keydown",e=>{if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==="a"){e.preventDefault();openOwner()}});
 $("#cartBtn").onclick=openCart;
 $("#trackBtn").onclick=openTrack;
 $("#closeTrack").onclick=closeTrack;
