@@ -42,6 +42,22 @@ function saveCart(){localStorage.setItem("andiCart",JSON.stringify(cart));render
 function productTotal(){return cart.reduce((a,x)=>a+x.price*x.qty,0)}
 function installationTotal(){return cart.reduce((a,x)=>a+x.install*x.qty,0)}
 function selectedInstallationTotal(){return $("#serviceOption")&&$("#serviceOption").value==="products_installation"?installationTotal():0}
+function selectedDeliveryFee(){
+  const option=$("#fulfilmentOption");
+  if(!option||option.value!=="delivery")return 0;
+  const area=$("#deliveryArea");
+  return area?Number(area.selectedOptions[0]?.dataset.fee||0):0;
+}
+function updateFulfilmentFields(){
+  const delivery=$("#fulfilmentOption")?.value==="delivery";
+  const wrap=$("#deliveryAreaWrap"),area=$("#deliveryArea"),address=$("#customerAddress");
+  if(wrap)wrap.style.display=delivery?"grid":"none";
+  if(area)area.required=delivery;
+  if(address){
+    address.required=true;
+    address.placeholder=delivery?"Town, suburb or delivery address":"Collection location / area";
+  }
+}
 
 function createOrderNumber(){
   const now=new Date();
@@ -79,10 +95,12 @@ function openCheckout(){
 }
 function closeCheckout(){$("#checkoutModal").classList.remove("open");$("#checkoutModal").setAttribute("aria-hidden","true")}
 function updateCheckout(){
-  const product=productTotal(),install=selectedInstallationTotal(),grand=product+install;
+  const product=productTotal(),install=selectedInstallationTotal(),delivery=selectedDeliveryFee(),grand=product+install+delivery;
+  const fulfilment=$("#fulfilmentOption")?.value==="delivery"?"Delivery":"Collection";
   $("#checkoutSummary").innerHTML=cart.map(x=>`<div><span>${x.name} × ${x.qty}</span><strong>${money(x.price*x.qty)}</strong></div>`).join("")+
     `<div class="summary-line"><span>Products</span><strong>${money(product)}</strong></div>`+
-    `<div class="summary-line"><span>Installation</span><strong>${install?money(install):"Not selected"}</strong></div>`;
+    `<div class="summary-line"><span>Installation</span><strong>${install?money(install):"Not selected"}</strong></div>`+
+    `<div class="summary-line"><span>${fulfilment}</span><strong>${delivery?money(delivery):"R0.00"}</strong></div>`;
   $("#checkoutGrandTotal").textContent=money(grand);
   $("#orderItemsField").value=cart.map(x=>`${x.name} × ${x.qty} = ${money(x.price*x.qty)}`).join(" | ");
   $("#productTotalField").value=money(product);
@@ -100,6 +118,7 @@ async function submitOrder(event){
   updateCheckout();
   $("#orderNumberField").value=orderNumber;
   $("#orderSubjectField").value="New Andi Electronics Order — "+orderNumber;
+  $("#deliveryArea").setAttribute("data-selected-fee",String(selectedDeliveryFee()));
   const form=$("#checkoutForm"),button=$("#submitOrderBtn");
   button.disabled=true;button.textContent="Sending order...";
   showCheckoutStatus("Creating your order...","loading");
@@ -149,6 +168,9 @@ $("#menuBtn").onclick=()=>$("#navLinks").classList.toggle("show");
 $("#checkoutBtn").onclick=openCheckout;
 $("#closeCheckout").onclick=closeCheckout;
 $("#serviceOption").onchange=updateCheckout;
+$("#fulfilmentOption").onchange=()=>{updateFulfilmentFields();updateCheckout()};
+$("#deliveryArea").onchange=updateCheckout;
 $("#checkoutForm").addEventListener("submit",submitOrder);
 $("#year").textContent=new Date().getFullYear();
+updateFulfilmentFields();
 renderCategories();renderProducts();renderCart();
