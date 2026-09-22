@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Shop Andi Electronics in South Africa for Automatic Night Lights, Motion-Sensor Lights, Water-Level Alarms, Door & Window Alarms, and smart electronics and automation solutions. Order online for delivery or collection.">
-  <meta name="robots" content="index, follow, max-image-preview:large">
-  <meta name="google-site-verification" content="7Py_DwdqdRXbnO7nINkFN90CGLYlqG0MR4mzG4XZBLc" />
+  <meta name="robots" content="index, follow, max-image-preview:large">\n  <meta name="google-site-verification" content="7Py_DwdqdRXbnO7nINkFN90CGLYlqG0MR4mzG4XZBLc" />
   <link rel="canonical" href="https://andisalebese839-web.github.io/ANDIELECTRONICS/">
   <meta name="theme-color" content="#0b1220">
   <title>Andi Electronics | Smart Electronics, Alarms & Automation in South Africa</title>
@@ -32,6 +31,8 @@
     }
   }
   </script>
+  <meta name="theme-color" content="#0b1220">
+  <title>Andi Electronics | Smart Electronics, Alarms & Automation in South Africa</title>
   <link rel="stylesheet" href="style.css?v=14">
 <style>
 .owner-modal{position:fixed;inset:0;background:rgba(7,13,25,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:1000}
@@ -178,17 +179,211 @@
 <div class="overlay" id="overlay"></div>
 <div class="account-modal" id="accountModal" aria-hidden="true"><div class="account-card"><div class="cart-head"><div><p class="eyebrow">WELCOME TO ANDI ELECTRONICS</p><h2 id="accountTitle">Create your account</h2></div><button type="button" id="closeAccount" aria-label="Close account">×</button></div><div class="account-visual"><div class="mini-robot">◉</div><div><strong>10% OFF YOUR FIRST ORDER</strong><span>Register with only your name and cellphone number.</span></div></div><form id="accountForm" class="account-form"><label>Full name<input id="accountName" required autocomplete="name" placeholder="Your full name"></label><label>Cellphone number<input id="accountPhone" required type="tel" autocomplete="tel" placeholder="079 123 4567"></label><button class="btn primary" type="submit">Create account & unlock 10%</button><div id="accountStatus" class="account-status" role="status" aria-live="polite"></div></form><div id="accountWelcome" hidden></div></div></div>
 
+
+<!-- Private owner area: hidden until the owner uses Alt + Shift + A -->
 <div class="owner-modal" id="ownerModal" aria-hidden="true">
   <div class="owner-card">
-    <div class="cart-head"><div><p class="eyebrow">ANDI ELECTRONICS • OWNER</p><h2>Owner dashboard</h2></div><button type="button" id="closeOwner" aria-label="Close owner area">×</button></div>
-    <div id="ownerLogin"><p class="owner-note">This private area is for the business owner only.</p><label>Email address<input id="ownerEmail" type="email" value="andisalebese839@gmail.com" autocomplete="username"></label><label>Password<input id="ownerPassword" type="password" autocomplete="current-password" placeholder="Your private password"></label><button class="btn primary" id="ownerLoginBtn" type="button">Sign in</button><div id="ownerLoginMessage" class="owner-message" role="status" aria-live="polite"></div></div>
-    <div id="ownerDashboard" hidden><div class="owner-dashboard-head"><div><strong>Customer orders</strong><span id="ownerOrderCount"></span></div><div class="owner-actions"><button class="btn ghost" id="ownerRefresh" type="button">Refresh</button><button class="btn primary" id="ownerLogout" type="button">Log out</button></div></div><div id="ownerMessage" class="owner-message" role="status" aria-live="polite"></div><div id="ownerOrders" class="owner-orders"><div class="empty">Loading orders...</div></div></div>
+    <div class="cart-head">
+      <div><p class="eyebrow">ANDI ELECTRONICS • OWNER</p><h2>Owner dashboard</h2></div>
+      <button type="button" id="closeOwner" aria-label="Close owner area">×</button>
+    </div>
+
+    <div id="ownerLogin">
+      <p class="owner-note">This private area is for the business owner only.</p>
+      <label>Email address<input id="ownerEmail" type="email" value="andisalebese839@gmail.com" autocomplete="username"></label>
+      <label>Password<input id="ownerPassword" type="password" autocomplete="current-password" placeholder="Your private password"></label>
+      <button class="btn primary" id="ownerLoginBtn" type="button">Sign in</button>
+      <div id="ownerLoginMessage" class="owner-message" role="status" aria-live="polite"></div>
+    </div>
+
+    <div id="ownerDashboard" hidden>
+      <div class="owner-dashboard-head">
+        <div><strong>Customer orders</strong><span id="ownerOrderCount"></span></div>
+        <div class="owner-actions"><button class="btn ghost" id="ownerRefresh" type="button">Refresh</button><button class="btn primary" id="ownerLogout" type="button">Log out</button></div>
+      </div>
+      <div id="ownerMessage" class="owner-message" role="status" aria-live="polite"></div>
+      <div id="ownerOrders" class="owner-orders"><div class="empty">Loading orders...</div></div>
+    </div>
   </div>
 </div>
 <div class="track-modal" id="trackModal" aria-hidden="true"><div class="track-card"><div class="cart-head"><div><p class="eyebrow">ORDER TRACKING</p><h2>Track your order</h2></div><button type="button" id="closeTrack" aria-label="Close tracking">×</button></div><p class="track-intro">Enter the unique order number you received after placing your order.</p><form id="trackForm" class="track-form"><input id="trackNumber" required placeholder="Example: AE-20260922-7F3A91BC" autocomplete="off"><button class="btn primary" type="submit">Track order</button></form><div id="trackResult" class="track-result" hidden></div></div></div>
 <script src="script.js?v=10"></script>
 <script>
-// Account, owner dashboard, checkout, tracking, and all existing functionality continue below.
+(function(){
+"use strict";
+function qs(id){return document.getElementById(id)}
+function initials(name){return String(name||"").trim().split(/\s+/).filter(Boolean).slice(0,2).map(function(x){return x[0].toUpperCase()}).join("")||"A"}
+async function hashPassword(value){
+  if(window.crypto&&crypto.subtle){
+    var bytes=new TextEncoder().encode(value);
+    var hash=await crypto.subtle.digest("SHA-256",bytes);
+    return Array.from(new Uint8Array(hash)).map(function(b){return b.toString(16).padStart(2,"0")}).join("");
+  }
+  return btoa(unescape(encodeURIComponent(value)));
+}
+function saveProfile(){localStorage.setItem("andiCustomerProfile",JSON.stringify(customerProfile))}
+function setAccountButton(){
+  var b=qs("accountBtn"); if(!b)return;
+  if(customerProfile){
+    b.innerHTML='<span class="customer-avatar customer-avatar-small">'+initials(customerProfile.name)+'</span><span>'+String(customerProfile.name||"").split(" ")[0]+'</span>';
+    b.setAttribute("aria-label","Open account for "+customerProfile.name);
+  }else{
+    b.innerHTML="Account";
+    b.setAttribute("aria-label","Create or log in to your account");
+  }
+}
+function showAccountState(){
+  var title=qs("accountTitle"),form=qs("accountForm");
+  if(!customerProfile){
+    title.textContent="Login";
+    form.innerHTML='<div class="account-tabs"><button type="button" class="account-tab active" id="loginTab">Login</button><button type="button" class="account-tab" id="registerTab">Register</button></div><div id="loginPanel"><p class="account-help">Log in with your name and password.</p><label>Full name<input id="loginName" required autocomplete="username" placeholder="Your full name"></label><label>Password<input id="loginPassword" required type="password" autocomplete="current-password" placeholder="Your password"></label><button class="btn primary" type="submit">Login</button><div id="accountStatus" class="account-status" role="status" aria-live="polite"></div></div><div id="registerPanel" hidden><p class="account-help">New here? Register with your name, cellphone number and a password.</p><label>Full name<input id="registerName" required autocomplete="name" placeholder="Your full name"></label><label>Cellphone number<input id="registerPhone" required type="tel" autocomplete="tel" placeholder="079 123 4567"></label><label>Password<input id="registerPassword" required type="password" minlength="6" autocomplete="new-password" placeholder="Create a password (6+ characters)"></label><button class="btn primary" type="button" id="registerSubmit">Register & unlock 10%</button><div id="registerStatus" class="account-status" role="status" aria-live="polite"></div></div>';
+    form.onsubmit=function(e){e.preventDefault();};
+    qs("loginTab").onclick=function(){qs("loginPanel").hidden=false;qs("registerPanel").hidden=true;qs("loginTab").classList.add("active");qs("registerTab").classList.remove("active")};
+    qs("registerTab").onclick=function(){qs("loginPanel").hidden=true;qs("registerPanel").hidden=false;qs("registerTab").classList.add("active");qs("loginTab").classList.remove("active")};
+    qs("loginPanel").querySelector("button").onclick=loginCustomer;
+    qs("registerSubmit").onclick=registerNewCustomer;
+  }else{
+    title.textContent="Welcome back, "+String(customerProfile.name||"").split(" ")[0]+"!";
+    form.innerHTML='<div class="account-profile-preview"><div class="customer-avatar">'+initials(customerProfile.name)+'</div><div><strong>'+escapeAccount(customerProfile.name)+'</strong><span>Your Andi Electronics account</span></div></div><label>Password<input id="accountPassword" required type="password" autocomplete="current-password" placeholder="Enter your password"></label><button class="btn primary" type="button" id="loggedLogin">Log in</button><div id="accountStatus" class="account-status" role="status" aria-live="polite"></div>';
+    qs("loggedLogin").onclick=loginCustomer;
+  }
+}
+function escapeAccount(v){return String(v||"").replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]})}
+async function registerNewCustomer(e){
+  if(e&&e.preventDefault)e.preventDefault();
+  var name=qs("registerName").value.trim(),phone=qs("registerPhone").value.trim(),password=qs("registerPassword").value,status=qs("registerStatus");
+  if(!name||!phone){status.textContent="Please enter your name and cellphone number.";status.className="account-status error";return}
+  if(password.length<6){status.textContent="Please choose a password with at least 6 characters.";status.className="account-status error";return}
+  var hash=await hashPassword(password);
+  customerProfile={name:name,phone:phone,passwordHash:hash,discountUsed:false,registeredAt:new Date().toISOString()};
+  saveProfile();setAccountButton();
+  status.textContent="Congratulations! 🎉 You have 10% OFF your first order.";
+  status.className="account-status success";
+  setTimeout(function(){showLoggedInAccount()},350);
+}
+async function loginCustomer(e){
+  if(e&&e.preventDefault)e.preventDefault();
+  var passwordField=qs("loginPassword")||qs("accountPassword"),status=qs("accountStatus"),password=passwordField?passwordField.value:"";
+  var hash=await hashPassword(password);
+  if(hash!==customerProfile.passwordHash){status.textContent="Incorrect password. Please try again.";status.className="account-status error";return}
+  status.textContent="";
+  showLoggedInAccount();
+}
+function showLoggedInAccount(){
+  var form=qs("accountForm"),title=qs("accountTitle");
+  title.textContent="Congratulations, "+String(customerProfile.name||"").split(" ")[0]+"! 🎉";
+  var ready=!customerProfile.discountUsed;
+  form.innerHTML='<div class="account-success-hero"><div class="customer-avatar customer-avatar-large">'+initials(customerProfile.name)+'</div><div><strong>Congratulations! 🎉</strong><span>'+ (ready ? "You have 10% OFF your first order." : "Your first-order 10% discount has already been used.") +'</span></div></div><div class="account-profile-preview"><div class="customer-avatar">'+initials(customerProfile.name)+'</div><div><strong>'+escapeAccount(customerProfile.name)+'</strong><span>'+escapeAccount(customerProfile.phone)+'</span></div></div><button class="btn primary" type="button" id="continueShoppingBtn">Continue shopping</button><div id="accountStatus" class="account-status success">'+(ready?"Your 10% discount will be applied automatically at checkout.":"Your account is ready for your next order.")+'</div>';
+  qs("continueShoppingBtn").onclick=function(){closeAccount();document.getElementById("shop").scrollIntoView({behavior:"smooth"})};
+  setAccountButton();
+  if(typeof syncCustomerToCheckout==="function")syncCustomerToCheckout();
+  if(typeof updateCheckout==="function")updateCheckout();
+}
+function enhancedOpenAccount(){
+  qs("accountModal").classList.add("open");qs("accountModal").setAttribute("aria-hidden","false");showAccountState();
+}
+function enhancedCloseAccount(){qs("accountModal").classList.remove("open");qs("accountModal").setAttribute("aria-hidden","true")}
+function enhancedSync(){
+  if(!customerProfile)return;
+  var n=qs("checkoutCustomerName"),p=qs("checkoutCustomerPhone"),note=qs("accountCheckoutNote");
+  if(n)n.value=customerProfile.name||"";
+  if(p)p.value=customerProfile.phone||"";
+  if(n)n.readOnly=true;if(p)p.readOnly=true;
+  if(note)note.textContent=customerProfile.discountUsed?"Your first-order 10% discount has already been used.":"Welcome back, "+customerProfile.name+" — your 10% first-order discount is active.";
+}
+document.addEventListener("DOMContentLoaded",function(){
+  setAccountButton();
+  qs("accountBtn").onclick=enhancedOpenAccount;
+  qs("closeAccount").onclick=enhancedCloseAccount;
+  if(typeof syncCustomerToCheckout==="function"){
+    var oldSync=syncCustomerToCheckout;
+    window.syncCustomerToCheckout=enhancedSync;
+  }
+  if(customerProfile){enhancedSync()}
+});
+})();
+</script>
+<script>
+(function(){
+"use strict";
+var SUPA="https://qheysduwchwjfxquglxu.supabase.co";
+var KEY="sb_publishable_folUp2DzQKjcMdhrobmhEQ_PWAE9wkn";
+var token=sessionStorage.getItem("andiOwnerToken")||"";
+var statuses=["Order received","Order accepted","Preparing order","Shipped","Out for delivery","Order delivered"];
+function byId(id){return document.getElementById(id)}
+function ownerShow(el,msg,type){el.textContent=msg;el.className="owner-message "+type}
+function ownerHeaders(){return {"apikey":KEY,"Authorization":"Bearer "+token,"Content-Type":"application/json","Accept":"application/json"}}
+function escOwner(v){return String(v==null?"":v).replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[ch]})}
+function ownerMoney(v){return "R"+Number(v||0).toFixed(2)}
+function openOwner(){
+  byId("ownerModal").classList.add("open");
+  byId("ownerModal").setAttribute("aria-hidden","false");
+  if(token){showOwnerDashboard();}else{byId("ownerLogin").hidden=false;byId("ownerDashboard").hidden=true;setTimeout(function(){byId("ownerPassword").focus()},100)}
+}
+function closeOwner(){byId("ownerModal").classList.remove("open");byId("ownerModal").setAttribute("aria-hidden","true")}
+function showOwnerDashboard(){byId("ownerLogin").hidden=true;byId("ownerDashboard").hidden=false;loadOwnerOrders()}
+async function ownerLogin(){
+  var btn=byId("ownerLoginBtn"),msg=byId("ownerLoginMessage"),email=byId("ownerEmail").value.trim(),password=byId("ownerPassword").value;
+  if(!email||!password){ownerShow(msg,"Please enter your email and password.","error");return}
+  btn.disabled=true;btn.textContent="Signing in...";
+  ownerShow(msg,"Connecting securely...","info");
+  try{
+    var response=await fetch(SUPA+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"apikey":KEY,"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({email:email,password:password})});
+    var raw=await response.text(),data={};
+    try{data=raw?JSON.parse(raw):{}}catch(e){}
+    if(!response.ok)throw new Error(data.error_description||data.msg||data.message||("Sign-in failed ("+response.status+")."));
+    if(!data.access_token)throw new Error("No login session was returned.");
+    token=data.access_token;sessionStorage.setItem("andiOwnerToken",token);byId("ownerPassword").value="";
+    ownerShow(msg,"Signed in successfully.","success");showOwnerDashboard();
+  }catch(err){ownerShow(msg,err.message||"Sign-in failed.","error")}
+  finally{btn.disabled=false;btn.textContent="Sign in"}
+}
+async function loadOwnerOrders(){
+  var list=byId("ownerOrders");list.innerHTML='<div class="empty">Loading orders...</div>';
+  try{
+    var response=await fetch(SUPA+"/rest/v1/orders?select=*&order=created_at.desc",{headers:ownerHeaders()});
+    var raw=await response.text(),data=[];
+    try{data=raw?JSON.parse(raw):[];}catch(e){}
+    if(!response.ok)throw new Error(data.message||data.hint||data.details||("Could not load orders ("+response.status+")."));
+    byId("ownerOrderCount").textContent=" ("+data.length+")";
+    if(!data.length){list.innerHTML='<div class="empty">No customer orders yet.</div>';return}
+    list.innerHTML=data.map(ownerCard).join("");
+  }catch(err){
+    list.innerHTML='<div class="empty">'+escOwner(err.message)+'</div>';
+    ownerShow(byId("ownerMessage"),err.message,"error");
+    if(/401|403|jwt|token|permission/i.test(err.message)){token="";sessionStorage.removeItem("andiOwnerToken");byId("ownerLogin").hidden=false;byId("ownerDashboard").hidden=true}
+  }
+}
+function ownerCard(o){
+  var items=[];try{items=Array.isArray(o.products)?o.products:JSON.parse(o.products||"[]")}catch(e){}
+  var current=o.status==="Delivered"?"Order delivered":o.status;
+  var opts=statuses.map(function(s){return '<option value="'+escOwner(s)+'" '+(s===current?"selected":"")+'>'+escOwner(s)+'</option>'}).join("");
+  return '<article class="owner-order"><div class="owner-order-head"><div><strong>'+escOwner(o.order_number)+'</strong><small>'+escOwner(new Date(o.created_at).toLocaleString())+'</small></div><strong>'+ownerMoney(o.order_total)+'</strong></div>'+
+  '<div class="owner-grid"><div><small>Customer</small>'+escOwner(o.customer_name)+'</div><div><small>Email</small>'+escOwner(o.customer_email)+'</div><div><small>Phone</small>'+escOwner(o.customer_phone)+'</div><div><small>Fulfilment</small>'+escOwner(o.fulfilment)+'</div><div><small>Area</small>'+escOwner(o.delivery_area||"Collection")+'</div><div><small>Address</small>'+escOwner(o.delivery_address||"—")+'</div></div>'+
+  '<strong>Products</strong><ul>'+items.map(function(x){return '<li>'+escOwner(x.name)+' × '+escOwner(x.qty)+'</li>'}).join("")+'</ul>'+
+  '<div class="owner-status"><select>'+opts+'</select><button class="btn primary owner-save" type="button" data-id="'+escOwner(o.id)+'" data-number="'+escOwner(o.order_number)+'">Save status</button></div></article>';
+}
+async function ownerSave(btn){
+  var select=btn.previousElementSibling,id=btn.dataset.id,num=btn.dataset.number;
+  btn.disabled=true;btn.textContent="Saving...";
+  try{
+    var response=await fetch(SUPA+"/rest/v1/orders?id=eq."+encodeURIComponent(id),{method:"PATCH",headers:Object.assign({},ownerHeaders(),{"Prefer":"return=representation"}),body:JSON.stringify({status:select.value,updated_at:new Date().toISOString()})});
+    var raw=await response.text(),data=[];try{data=raw?JSON.parse(raw):[]}catch(e){}
+    if(!response.ok)throw new Error(data.message||data.hint||data.details||("Could not update order ("+response.status+")."));
+    ownerShow(byId("ownerMessage"),num+" updated to "+select.value+".","success");loadOwnerOrders();
+  }catch(err){ownerShow(byId("ownerMessage"),"Could not update "+num+": "+err.message,"error")}
+  finally{btn.disabled=false;btn.textContent="Save status"}
+}
+document.addEventListener("DOMContentLoaded",function(){
+  document.addEventListener("keydown",function(e){if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==="a"){e.preventDefault();openOwner()}});
+  byId("closeOwner").onclick=closeOwner;
+  byId("ownerLoginBtn").onclick=ownerLogin;
+  byId("ownerPassword").addEventListener("keydown",function(e){if(e.key==="Enter")ownerLogin()});
+  byId("ownerRefresh").onclick=loadOwnerOrders;
+  byId("ownerLogout").onclick=function(){token="";sessionStorage.removeItem("andiOwnerToken");byId("ownerLogin").hidden=false;byId("ownerDashboard").hidden=true;byId("ownerLoginMessage").textContent=""};
+  byId("ownerOrders").addEventListener("click",function(e){var b=e.target.closest(".owner-save");if(b)ownerSave(b)});
+});
+})();
 </script>
 </body>
 </html>
