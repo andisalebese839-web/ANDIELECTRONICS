@@ -6,7 +6,14 @@ const products=[
 {id:5,name:"Automatic Entry Light & Alarm",category:"Security",price:499,install:300,icon:"🚨",image:"https://www.futurelight.co.za/cdn/shop/files/PioLEDLighting-PioLEDLighting-F356S30WOoberIP65LEDSensorFloodlight6000K_3000K.png?v=1761058896&width=1024",desc:"Motion-triggered entrance lighting with an optional alarm."}
 ];
 let cart=JSON.parse(localStorage.getItem("andiCart")||"[]"),active="All";
-const ORDER_STATUS_KEY="andiOrderStatuses";
+const SUPABASE_URL="https://qheysduwchwjfxquglxu.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_folUp2DzQKjcMdhrobmhEQ_PWAE9wkn";
+const SUPABASE_HEADERS={
+  "apikey":SUPABASE_PUBLISHABLE_KEY,
+  "Authorization":"Bearer "+SUPABASE_PUBLISHABLE_KEY,
+  "Content-Type":"application/json",
+  "Accept":"application/json"
+};
 const $=s=>document.querySelector(s),money=n=>"R"+Number(n).toFixed(2);
 
 function renderCategories(){
@@ -108,10 +115,31 @@ function updateCheckout(){
   $("#installationTotalField").value=money(install);
   $("#orderTotalField").value=money(grand);
 }
-function getOrderStatuses(){return JSON.parse(localStorage.getItem(ORDER_STATUS_KEY)||"{}")}
-function getOrderStatus(orderNumber){return getOrderStatuses()[orderNumber]||"Order received"}
 function statusSteps(status){const steps=["Order received","Preparing order","Shipped","Out for delivery","Delivered"];const index=Math.max(0,steps.indexOf(status));return steps.map((x,i)=>`<div class="track-step ${i<index?"done":""} ${i===index?"current":""}"><span>${i<index?"✓":i+1}</span><strong>${x}</strong></div>`).join("")}
-function trackOrder(number){const result=$("#trackResult");const clean=number.trim().toUpperCase();const status=getOrderStatus(clean);result.hidden=false;result.innerHTML=`<div class="track-number">${clean}</div><div class="track-status"><strong>Current status: ${status}</strong><span>Order updates will appear here when your order status is updated.</span></div><div class="track-timeline">${statusSteps(status)}</div>`}
+async function trackOrder(number){
+  const result=$("#trackResult");
+  const clean=number.trim().toUpperCase();
+  if(!clean){result.hidden=false;result.innerHTML="<div class='track-status'><strong>Please enter your order number.</strong></div>";return}
+  result.hidden=false;
+  result.innerHTML="<div class='track-status'><strong>Checking your order...</strong><span>Please wait.</span></div>";
+  try{
+    const response=await fetch(SUPABASE_URL+"/rest/v1/rpc/track_order",{
+      method:"POST",headers:SUPABASE_HEADERS,
+      body:JSON.stringify({order_number_input:clean})
+    });
+    if(!response.ok)throw new Error("Tracking request failed");
+    const data=await response.json();
+    const order=Array.isArray(data)?data[0]:data;
+    if(!order){
+      result.innerHTML=`<div class="track-number">${clean}</div><div class="track-status"><strong>Order not found</strong><span>Please check the order number and try again.</span></div>`;
+      return;
+    }
+    result.innerHTML=`<div class="track-number">${order.order_number}</div><div class="track-status"><strong>Current status: ${order.status}</strong><span>Last updated: ${new Date(order.updated_at).toLocaleString()}</span></div><div class="track-timeline">${statusSteps(order.status)}</div>`;
+  }catch(error){
+    console.error(error);
+    result.innerHTML="<div class='track-status'><strong>Tracking is temporarily unavailable.</strong><span>Please try again in a moment or contact us on WhatsApp.</span></div>";
+  }
+}
 function openTrack(){$("#trackModal").classList.add("open");$("#trackModal").setAttribute("aria-hidden","false");$("#trackResult").hidden=true}
 function closeTrack(){$("#trackModal").classList.remove("open");$("#trackModal").setAttribute("aria-hidden","true")}
 function showCheckoutStatus(message,type){
@@ -125,28 +153,47 @@ async function submitOrder(event){
   updateCheckout();
   $("#orderNumberField").value=orderNumber;
   $("#orderSubjectField").value="New Andi Electronics Order — "+orderNumber;
-  $("#deliveryArea").setAttribute("data-selected-fee",String(selectedDeliveryFee()));
   const form=$("#checkoutForm"),button=$("#submitOrderBtn");
   button.disabled=true;button.textContent="Sending order...";
   showCheckoutStatus("Creating your order...","loading");
+  const product=productTotal(),install=selectedInstallationTotal(),delivery=selectedDeliveryFee(),grand=product+install+delivery;
+  const orderData={
+    order_number:orderNumber,
+    customer_name:form.elements.full_name.value.trim(),
+    customer_email:form.elements.email.value.trim(),
+    customer_phone:form.elements.customer_phone.value.trim(),
+    fulfilment:$("#fulfilmentOption").value,
+    delivery_area:$("#deliveryArea").value||"",
+    delivery_address:$("#customerAddress").value||"",
+    products:cart.map(x=>({id:x.id,name:x.name,qty:x.qty,price:x.price,install:x.install})),
+    product_total:product,
+    installation_total:install,
+    delivery_fee:delivery,
+    order_total:grand,
+    additional_instructions:form.elements.additional_instructions?.value||""
+  };
   try{
-    const response=await fetch("https://formspree.io/f/mnpndglk",{
-      method:"POST",
-      headers:{"Accept":"application/json"},
-      body:new FormData(form)
+    const dbResponse=await fetch(SUPABASE_URL+"/rest/v1/rpc/create_order",{
+      method:"POST",headers:SUPABASE_HEADERS,
+      body:JSON.stringify({order_data:orderData})
     });
-    if(!response.ok)throw new Error("Submission failed");
-    const customerEmail=form.elements.email.value;
+    if(!dbResponse.ok)throw new Error(await dbResponse.text()||"Database order creation failed");
+
+    try{
+      await fetch("https://formspree.io/f/mnpndglk",{
+        method:"POST",headers:{"Accept":"application/json"},body:new FormData(form)
+      });
+    }catch(notificationError){
+      console.warn("Order was saved, but email notification could not be sent.",notificationError);
+    }
+
     const customerPhone=form.elements.customer_phone.value;
-    form.reset();
-    cart=[];
-    saveCart();
-    $("#checkoutSummary").innerHTML="<div class='order-success'><strong>Order request sent ✓</strong><span>Your order has been received by Andi Electronics.</span></div>";
+    form.reset();cart=[];saveCart();
+    $("#checkoutSummary").innerHTML="<div class='order-success'><strong>Order request sent ✓</strong><span>Your order has been saved successfully.</span></div>";
     $("#checkoutGrandTotal").textContent="R0.00";
     $("#orderConfirmation").hidden=false;
     $("#orderConfirmation").innerHTML=`
-      <span>Your unique order number</span>
-      <strong>${orderNumber}</strong>
+      <span>Your unique order number</span><strong>${orderNumber}</strong>
       <p>Save this number. We will use it to identify your order.</p>
       <div class="confirmation-actions">
         <button type="button" class="small-btn" onclick="copyOrderNumber('${orderNumber}')">Copy order number</button>
@@ -154,7 +201,8 @@ async function submitOrder(event){
       </div>`;
     showCheckoutStatus("Order created successfully. Your order number is "+orderNumber+".","success");
   }catch(error){
-    showCheckoutStatus("We could not send the order right now. Please try again or order through WhatsApp.","error");
+    console.error(error);
+    showCheckoutStatus("We could not save the order right now. Please try again or order through WhatsApp.","error");
   }finally{
     button.disabled=false;button.textContent="Send order request";
   }
