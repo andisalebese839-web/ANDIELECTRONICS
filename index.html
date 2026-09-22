@@ -22,7 +22,7 @@
     <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
     <nav id="navLinks">
       <a href="#home">Home</a><a href="#shop">Shop</a><a href="#services">Services</a><a href="#about">About</a><a href="#contact">Contact</a>
-      <button class="cart-btn" id="cartBtn">Cart <span id="cartCount">0</span></button><button class="track-btn" id="trackBtn">Track order</button>
+      <button class="account-btn" id="accountBtn">Register / Account</button><button class="cart-btn" id="cartBtn">Cart <span id="cartCount">0</span></button><button class="track-btn" id="trackBtn">Track order</button>
     </nav>
   </div>
 </header>
@@ -33,11 +33,11 @@
     <div>
       <p class="eyebrow">SMART • PRACTICAL • INNOVATIVE</p>
       <h1>Electronics that solve <span>real problems.</span></h1>
-      <p class="hero-text">Custom electronics, automation projects and practical technology for homes, businesses and growing industries.</p>
+      <p class="hero-text">Custom electronics, automation projects and practical technology for homes, businesses and growing industries.</p><div class="welcome-offer"><span>⚡ FIRST-TIME CUSTOMER</span><strong>Register today and unlock 10% OFF your first order.</strong><small>Your welcome discount is applied automatically at checkout.</small></div>
       <div class="hero-actions"><a class="btn primary" href="#shop">Explore products</a><a class="btn ghost" href="#contact">Request a project</a></div>
       <div class="trust"><span>✓ Custom solutions</span><span>✓ South African business</span><span>✓ Built with purpose</span></div>
     </div>
-    <div class="hero-card">
+    <div class="hero-card"><div class="robot-core"><div class="robot-face"><i></i><i></i><b></b></div><span class="orbit orbit-a"></span><span class="orbit orbit-b"></span><span class="node node-a"></span><span class="node node-b"></span><span class="node node-c"></span></div>
       <div class="circuit"><span>+</span><i></i><b></b><em></em></div>
       <h3>Build • Automate • Improve</h3>
       <p>From small electronic products to automation prototypes.</p>
@@ -120,10 +120,8 @@
       <input type="hidden" name="order_items" id="orderItemsField">
       <input type="hidden" name="product_total" id="productTotalField">
       <input type="hidden" name="installation_total" id="installationTotalField">
-      <input type="hidden" name="order_total" id="orderTotalField">
-      <label>Full name<input required name="customer_name" autocomplete="name" placeholder="Your full name"></label>
-      <label>Email address<input required type="email" name="email" autocomplete="email" placeholder="you@example.com"></label>
-      <label>Phone / WhatsApp<input required type="tel" name="customer_phone" autocomplete="tel" placeholder="079 123 4567"></label>
+      <input type="hidden" name="order_total" id="orderTotalField"><input type="hidden" name="discount_total" id="discountTotalField">
+      <label>Registered name<input required name="customer_name" id="checkoutCustomerName" autocomplete="name" placeholder="Register first"></label><input type="hidden" name="email" id="checkoutEmail" value="no-email@andi.local"><label>Registered cellphone<input required type="tel" name="customer_phone" id="checkoutCustomerPhone" autocomplete="tel" placeholder="Register first"></label><div id="accountCheckoutNote" class="account-checkout-note">Register first to unlock your 10% first-order discount.</div>
       <label>Fulfilment option<select required name="fulfilment_option" id="fulfilmentOption">
         <option value="collection">Collection — R0</option>
         <option value="delivery">Delivery</option>
@@ -143,7 +141,7 @@
         <option value="products_installation">Products + installation</option>
       </select></label>
       <label>Additional instructions (optional)<textarea name="customer_notes" rows="4" placeholder="Anything we should know about your order?"></textarea></label>
-      <div class="checkout-total"><span>Estimated total</span><strong id="checkoutGrandTotal">R0.00</strong></div>
+      <div id="checkoutDiscountLine" class="checkout-discount-line" hidden><span>First-order discount (10%)</span><strong id="checkoutDiscount">-R0.00</strong></div><div class="checkout-total"><span>Estimated total</span><strong id="checkoutGrandTotal">R0.00</strong></div>
       <p class="checkout-note">Your unique order number will be created when you submit this request. Keep it for order tracking. Payment is not taken yet.</p>
       <button class="btn primary" id="submitOrderBtn" type="submit">Send order request</button>
       <div id="checkoutStatus" class="checkout-status" role="status" aria-live="polite"></div>
@@ -152,6 +150,8 @@
   </div>
 </div>
 <div class="overlay" id="overlay"></div>
+<div class="account-modal" id="accountModal" aria-hidden="true"><div class="account-card"><div class="cart-head"><div><p class="eyebrow">WELCOME TO ANDI ELECTRONICS</p><h2 id="accountTitle">Create your account</h2></div><button type="button" id="closeAccount" aria-label="Close account">×</button></div><div class="account-visual"><div class="mini-robot">◉</div><div><strong>10% OFF YOUR FIRST ORDER</strong><span>Register with only your name and cellphone number.</span></div></div><form id="accountForm" class="account-form"><label>Full name<input id="accountName" required autocomplete="name" placeholder="Your full name"></label><label>Cellphone number<input id="accountPhone" required type="tel" autocomplete="tel" placeholder="079 123 4567"></label><button class="btn primary" type="submit">Create account & unlock 10%</button><div id="accountStatus" class="account-status" role="status" aria-live="polite"></div></form><div id="accountWelcome" hidden></div></div></div>
+
 
 <!-- Private owner area: hidden until the owner uses Alt + Shift + A -->
 <div class="owner-modal" id="ownerModal" aria-hidden="true">
@@ -180,7 +180,7 @@
   </div>
 </div>
 <div class="track-modal" id="trackModal" aria-hidden="true"><div class="track-card"><div class="cart-head"><div><p class="eyebrow">ORDER TRACKING</p><h2>Track your order</h2></div><button type="button" id="closeTrack" aria-label="Close tracking">×</button></div><p class="track-intro">Enter the unique order number you received after placing your order.</p><form id="trackForm" class="track-form"><input id="trackNumber" required placeholder="Example: AE-20260922-7F3A91BC" autocomplete="off"><button class="btn primary" type="submit">Track order</button></form><div id="trackResult" class="track-result" hidden></div></div></div>
-<script src="script.js?v=8"></script>
+<script src="script.js?v=9"></script>
 <script>
 (function(){
 "use strict";
