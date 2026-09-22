@@ -223,19 +223,21 @@ function showAccountState(){
 }
 function escapeAccount(v){return String(v||"").replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]})}
 async function registerNewCustomer(e){
-  e.preventDefault();
-  var name=qs("accountName").value.trim(),phone=qs("accountPhone").value.trim(),password=qs("accountPassword").value,status=qs("accountStatus");
+  if(e&&e.preventDefault)e.preventDefault();
+  var name=qs("registerName").value.trim(),phone=qs("registerPhone").value.trim(),password=qs("registerPassword").value,status=qs("registerStatus");
+  if(!name||!phone){status.textContent="Please enter your name and cellphone number.";status.className="account-status error";return}
   if(password.length<6){status.textContent="Please choose a password with at least 6 characters.";status.className="account-status error";return}
   var hash=await hashPassword(password);
   customerProfile={name:name,phone:phone,passwordHash:hash,discountUsed:false,registeredAt:new Date().toISOString()};
   saveProfile();setAccountButton();
   status.textContent="Congratulations! 🎉 You have 10% OFF your first order.";
   status.className="account-status success";
-  setTimeout(function(){showLoggedInAccount()},450);
+  setTimeout(function(){showLoggedInAccount()},350);
 }
 async function loginCustomer(e){
-  e.preventDefault();
-  var password=qs("accountPassword").value,status=qs("accountStatus"),hash=await hashPassword(password);
+  if(e&&e.preventDefault)e.preventDefault();
+  var passwordField=qs("loginPassword")||qs("accountPassword"),status=qs("accountStatus"),password=passwordField?passwordField.value:"";
+  var hash=await hashPassword(password);
   if(hash!==customerProfile.passwordHash){status.textContent="Incorrect password. Please try again.";status.className="account-status error";return}
   status.textContent="";
   showLoggedInAccount();
