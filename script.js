@@ -1,14 +1,26 @@
 const products=[
-{id:1,name:"Automatic Night Light",category:"Smart Lighting",price:349,install:250,icon:"🌙",image:"https://lumiliving.co.za/cdn/shop/files/IMG01_674149aa-f71f-4dd1-acf3-7edeb9010c66.jpg?v=1770915819&width=1024",desc:"Automatically switches on when it gets dark and off again when daylight returns. Ideal for bedrooms, passages and entrances."},
-{id:2,name:"Motion-Sensor Light",category:"Smart Lighting",price:449,install:300,icon:"🚶",image:"https://www.futurelight.co.za/cdn/shop/files/PioLEDLighting-F356S30WOoberIP65LEDSensorFloodlight6000K_3000K.png?v=1761058896&width=1024",desc:"A practical motion-activated light for entrances, garages, passages and outdoor access points."},
-{id:3,name:"Water-Level Alarm",category:"Safety & Alerts",price:349,install:250,icon:"💧",image:"https://leobot.net/productimages/259.webp",desc:"Detects rising water and gives an audible warning when the water reaches the set sensor level."},
-{id:4,name:"Door & Window Alarm",category:"Security",price:349,install:200,icon:"🚪",image:"https://dummyimage.com/900x650/e8eef7/101828.png&text=Door+%26+Window+Alarm",desc:"A compact magnetic entry alarm designed to sound when a protected door or window is opened."},
-{id:5,name:"Automatic Entry Light & Alarm",category:"Security",price:499,install:300,icon:"🚨",image:"https://www.futurelight.co.za/cdn/shop/files/PioLEDLighting-F356S30WOoberIP65LEDSensorFloodlight6000K_3000K.png?v=1761058896&width=1024",desc:"A combined entrance solution using motion detection to activate lighting, with an optional alarm feature."}
+{id:1,name:"Automatic Night Light",category:"Smart Lighting",price:349,install:250,icon:"🌙",image:"https://lumiliving.co.za/cdn/shop/files/IMG01_674149aa-f71f-4dd1-acf3-7edeb9010c66.jpg?v=1770915819&width=1024",desc:"Automatic dusk-to-dawn light for bedrooms, passages and entrances."},
+{id:2,name:"Motion-Sensor Light",category:"Smart Lighting",price:449,install:300,icon:"🚶",image:"https://www.futurelight.co.za/cdn/shop/files/PioLEDLighting-F356S30WOoberIP65LEDSensorFloodlight6000K_3000K.png?v=1761058896&width=1024",desc:"Motion-activated lighting for entrances, garages, passages and outdoor areas."},
+{id:3,name:"Water-Level Alarm",category:"Safety & Alerts",price:349,install:250,icon:"💧",image:"https://leobot.net/productimages/259.webp",desc:"Water detection alarm that sounds when the sensor reaches the set level."},
+{id:4,name:"Door & Window Alarm",category:"Security",price:349,install:200,icon:"🚪",image:"https://dummyimage.com/900x650/111827/ffffff.png&text=DOOR+%26+WINDOW+ALARM",desc:"Magnetic entry alarm for doors and windows."},
+{id:5,name:"Automatic Entry Light & Alarm",category:"Security",price:499,install:300,icon:"🚨",image:"https://www.futurelight.co.za/cdn/shop/files/PioLEDLighting-F356S30WOoberIP65LEDSensorFloodlight6000K_3000K.png?v=1761058896&width=1024",desc:"Motion-triggered entrance lighting with an optional alarm."}
 ];
 let cart=JSON.parse(localStorage.getItem("andiCart")||"[]"),active="All";
 const $=s=>document.querySelector(s),money=n=>"R"+n.toFixed(2);
 function renderCategories(){const cats=["All",...new Set(products.map(p=>p.category))];$("#categories").innerHTML=cats.map(c=>`<button class="chip ${c===active?"active":""}" onclick="setCategory('${c}')">${c}</button>`).join("")}
-function renderProducts(){const q=$("#search").value.toLowerCase();const list=products.filter(p=>(active==="All"||p.category===active)&&(p.name+p.desc+p.category).toLowerCase().includes(q));$("#productGrid").innerHTML=list.length?list.map(p=>`<article class="product"><div class="pic"><img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='https://dummyimage.com/900x650/e8eef7/101828.png&text=Andi+Electronics'"></div><p class="eyebrow">${p.category}</p><h3>${p.name}</h3><p>${p.desc}</p><div class="product-meta"><span class="price">${money(p.price)}</span><span class="install">Installation from ${money(p.install)}</span></div><div class="product-row"><button class="small-btn" onclick="addToCart(${p.id})">Add to cart</button><a class="quote-link" href="#contact">Ask about customization</a></div></article>`).join(""):'<p class="empty">No products found.</p>'}
+function renderProducts(){
+ const q=$("#search").value.toLowerCase();
+ const list=products.filter(p=>(active==="All"||p.category===active)&&(p.name+p.desc+p.category).toLowerCase().includes(q));
+ $("#productGrid").innerHTML=list.length?list.map(p=>`
+ <article class="product">
+   <div class="pic"><img src="${p.image}" alt="${p.name}" loading="eager" onerror="this.onerror=null;this.src='https://dummyimage.com/900x650/0b1220/ffffff.png&text=${encodeURIComponent(p.name)}'"></div>
+   <p class="eyebrow">${p.category}</p>
+   <h3>${p.name}</h3>
+   <p>${p.desc}</p>
+   <div class="product-meta"><span class="price">${money(p.price)}</span><span class="install">Installation from ${money(p.install)}</span></div>
+   <div class="product-row"><button class="small-btn" onclick="addToCart(${p.id})">Add to cart</button><a class="quote-link" href="#contact">Ask about customization</a></div>
+ </article>`).join(""):'<p class="empty">No products found.</p>'
+}
 function setCategory(c){active=c;renderCategories();renderProducts()}
 function addToCart(id){const p=products.find(x=>x.id===id);const item=cart.find(x=>x.id===id);item?item.qty++:cart.push({...p,qty:1});saveCart();openCart()}
 function removeFromCart(id){cart=cart.filter(x=>x.id!==id);saveCart()}
@@ -17,5 +29,5 @@ function renderCart(){const count=cart.reduce((a,x)=>a+x.qty,0),total=cart.reduc
 function openCart(){$("#cartDrawer").classList.add("open");$("#overlay").classList.add("show")}
 function closeCart(){$("#cartDrawer").classList.remove("open");$("#overlay").classList.remove("show")}
 $("#cartBtn").onclick=openCart;$("#closeCart").onclick=closeCart;$("#overlay").onclick=closeCart;$("#search").oninput=renderProducts;$("#menuBtn").onclick=()=>$("#navLinks").classList.toggle("show");
-$("#checkoutBtn").onclick=()=>{if(!cart.length){alert("Your cart is empty.");return}alert("Checkout is ready to connect to your payment provider. Your cart is saved in this browser.");};
+$("#checkoutBtn").onclick=()=>{if(!cart.length){alert("Your cart is empty.");return}alert("Checkout is coming next. Your cart is saved in this browser.");};
 $("#year").textContent=new Date().getFullYear();renderCategories();renderProducts();renderCart();
