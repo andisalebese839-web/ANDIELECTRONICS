@@ -3,7 +3,8 @@ const products=[
 {id:2,name:"Motion-Sensor Light",category:"Smart Lighting",price:449,install:300,icon:"🚶",image:"https://www.futurelight.co.za/cdn/shop/files/PioLEDLighting-F356S30WOoberIP65LEDSensorFloodlight6000K_3000K.png?v=1761058896&width=1024",desc:"Motion-activated lighting for entrances, garages, passages and outdoor areas."},
 {id:3,name:"Water-Level Alarm",category:"Safety & Alerts",price:349,install:250,icon:"💧",image:"https://leobot.net/productimages/259.webp",desc:"Water detection alarm that sounds when the sensor reaches the set level."},
 {id:4,name:"Door & Window Alarm",category:"Security",price:349,install:200,icon:"🚪",image:"https://dummyimage.com/900x650/111827/ffffff.png&text=DOOR+%26+WINDOW+ALARM",desc:"Magnetic entry alarm for doors and windows."},
-{id:5,name:"Automatic Entry Light & Alarm",category:"Security",price:499,install:300,icon:"🚨",image:"https://www.futurelight.co.za/cdn/shop/files/PioLEDLighting-PioLEDLighting-F356S30WOoberIP65LEDSensorFloodlight6000K_3000K.png?v=1761058896&width=1024",desc:"Motion-triggered entrance lighting with an optional alarm."}
+{id:5,name:"Automatic Entry Light & Alarm",category:"Security",price:499,install:300,icon:"🚨",image:"https://www.futurelight.co.za/cdn/shop/files/PioLEDLighting-PioLEDLighting-F356S30WOoberIP65LEDSensorFloodlight6000K_3000K.png?v=1761058896&width=1024",desc:"Motion-triggered entrance lighting with an optional alarm."},
+{id:6,name:"MachineWatch Downtime Monitor",category:"Industrial Automation",price:2499,install:750,icon:"🏭",image:"https://dummyimage.com/900x650/eaf5ff/1268e8.png&text=MachineWatch+Downtime+Monitor",desc:"Real-time machine-state monitoring that records when a machine stops and how long the downtime lasts."}
 ];
 let cart=JSON.parse(localStorage.getItem("andiCart")||"[]"),active="All";
 let customerProfile=JSON.parse(localStorage.getItem("andiCustomerProfile")||"null");
@@ -32,7 +33,7 @@ function renderProducts(){
     <h3>${p.name}</h3>
     <p>${p.desc}</p>
     <div class="product-meta"><span class="price">${money(p.price)}</span><span class="install">Installation from ${money(p.install)}</span></div>
-    <div class="product-row"><button class="small-btn" onclick="addToCart(${p.id})">Add to cart</button><a class="small-btn product-view-link" href="${{"1":"automatic-night-light.html","2":"motion-sensor-light.html","3":"water-level-alarm.html","4":"door-window-alarm.html","5":"automatic-entry-light-alarm.html"}[p.id]}">View product</a><a class="quote-link" href="#contact">Ask about customization</a></div>
+    <div class="product-row"><button class="small-btn" onclick="addToCart(${p.id})">Add to cart</button><a class="small-btn product-view-link" href="${{"1":"automatic-night-light.html","2":"motion-sensor-light.html","3":"water-level-alarm.html","4":"door-window-alarm.html","5":"automatic-entry-light-alarm.html","6":"machinewatch-downtime-monitor.html"}[p.id]}">View product</a><a class="quote-link" href="#contact">Ask about customization</a></div>
   </article>`).join(""):'<p class="empty">No products found.</p>';
 }
 function setCategory(c){active=c;renderCategories();renderProducts()}
