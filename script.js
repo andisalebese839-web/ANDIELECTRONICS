@@ -6,6 +6,8 @@ const products=[
 {id:5,name:"Automatic Entry Light & Alarm",category:"Security",price:499,install:300,icon:"🚨",image:"https://www.futurelight.co.za/cdn/shop/files/PioLEDLighting-PioLEDLighting-F356S30WOoberIP65LEDSensorFloodlight6000K_3000K.png?v=1761058896&width=1024",desc:"Motion-triggered entrance lighting with an optional alarm."}
 ];
 let cart=JSON.parse(localStorage.getItem("andiCart")||"[]"),active="All";
+let customerProfile=JSON.parse(localStorage.getItem("andiCustomerProfile")||"null");
+const WELCOME_RATE=0.10;
 const SUPABASE_URL="https://qheysduwchwjfxquglxu.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_folUp2DzQKjcMdhrobmhEQ_PWAE9wkn";
 const SUPABASE_HEADERS={
@@ -48,6 +50,13 @@ function changeQty(id,delta){
 function removeFromCart(id){cart=cart.filter(x=>x.id!==id);saveCart()}
 function saveCart(){localStorage.setItem("andiCart",JSON.stringify(cart));renderCart()}
 function productTotal(){return cart.reduce((a,x)=>a+x.price*x.qty,0)}
+function welcomeEligible(){return !!customerProfile&&!customerProfile.discountUsed}
+function welcomeDiscount(product,install,delivery){return welcomeEligible()?(product+install+delivery)*WELCOME_RATE:0}
+function saveCustomerProfile(){localStorage.setItem("andiCustomerProfile",JSON.stringify(customerProfile))}
+function openAccount(){$("#accountModal").classList.add("open");$("#accountModal").setAttribute("aria-hidden","false");$("#accountStatus").textContent="";if(customerProfile){$("#accountTitle").textContent="Your account";$("#accountName").value=customerProfile.name||"";$("#accountPhone").value=customerProfile.phone||"";$("#accountName").readOnly=true;$("#accountPhone").readOnly=true;$("#accountForm button").textContent="Account registered ✓";$("#accountForm button").disabled=true;$("#accountStatus").textContent=customerProfile.discountUsed?"Your first-order discount has already been used.":"Your 10% first-order discount is ready to use."}else{$("#accountTitle").textContent="Create your account";$("#accountName").readOnly=false;$("#accountPhone").readOnly=false;$("#accountForm button").disabled=false;$("#accountForm button").textContent="Create account & unlock 10%"}}
+function closeAccount(){$("#accountModal").classList.remove("open");$("#accountModal").setAttribute("aria-hidden","true")}
+function registerCustomer(e){e.preventDefault();const name=$("#accountName").value.trim(),phone=$("#accountPhone").value.trim();if(!name||!phone)return;customerProfile={name,phone,discountUsed:false,registeredAt:new Date().toISOString()};saveCustomerProfile();$("#accountStatus").textContent="Account created. Your 10% first-order discount is unlocked!";$("#accountStatus").className="account-status success";$("#accountForm button").disabled=true;$("#accountForm button").textContent="10% discount unlocked ✓";syncCustomerToCheckout();updateCheckout()}
+function syncCustomerToCheckout(){if(!customerProfile)return;$("#checkoutCustomerName").value=customerProfile.name;$("#checkoutCustomerPhone").value=customerProfile.phone;$("#checkoutCustomerName").readOnly=true;$("#checkoutCustomerPhone").readOnly=true;$("#accountCheckoutNote").textContent=welcomeEligible()?"Welcome back, "+customerProfile.name+" — your 10% first-order discount is active.":"Your first-order 10% discount has already been used."}
 function installationTotal(){return cart.reduce((a,x)=>a+x.install*x.qty,0)}
 function selectedInstallationTotal(){return $("#serviceOption")&&$("#serviceOption").value==="products_installation"?installationTotal():0}
 const deliveryLocations={
@@ -137,13 +146,15 @@ function openCheckout(){
 }
 function closeCheckout(){$("#checkoutModal").classList.remove("open");$("#checkoutModal").setAttribute("aria-hidden","true")}
 function updateCheckout(){
-  const product=productTotal(),install=selectedInstallationTotal(),delivery=selectedDeliveryFee(),grand=product+install+delivery;
+  const product=productTotal(),install=selectedInstallationTotal(),delivery=selectedDeliveryFee(),subtotal=product+install+delivery,discount=welcomeDiscount(product,install,delivery),grand=subtotal-discount;
   const fulfilment=$("#fulfilmentOption")?.value==="delivery"?"Delivery":"Collection";
   $("#checkoutSummary").innerHTML=cart.map(x=>`<div><span>${x.name} × ${x.qty}</span><strong>${money(x.price*x.qty)}</strong></div>`).join("")+
     `<div class="summary-line"><span>Products</span><strong>${money(product)}</strong></div>`+
     `<div class="summary-line"><span>Installation</span><strong>${install?money(install):"Not selected"}</strong></div>`+
     `${fulfilment==="Delivery"?deliveryChargeBreakdown():`<div class="summary-line"><span>Collection</span><strong>R0.00</strong></div>`}`;
   $("#checkoutGrandTotal").textContent=money(grand);
+  $("#checkoutDiscountLine").hidden=!discount;$("#checkoutDiscount").textContent="-"+money(discount);
+  $("#discountTotalField").value=discount.toFixed(2);
   $("#orderItemsField").value=cart.map(x=>`${x.name} × ${x.qty} = ${money(x.price*x.qty)}`).join(" | ");
   $("#productTotalField").value=money(product);
   $("#installationTotalField").value=money(install);
@@ -187,6 +198,7 @@ function showCheckoutStatus(message,type){
 }
 async function submitOrder(event){
   event.preventDefault();
+  if(!customerProfile){showCheckoutStatus("Please register first to unlock your 10% first-order discount.","error");closeCheckout();openAccount();return}
   if(!cart.length){showCheckoutStatus("Your cart is empty.","error");return}
   const orderNumber=createOrderNumber();
   updateCheckout();
@@ -195,7 +207,7 @@ async function submitOrder(event){
   const form=$("#checkoutForm"),button=$("#submitOrderBtn");
   button.disabled=true;button.textContent="Sending order...";
   showCheckoutStatus("Creating your order...","loading");
-  const product=productTotal(),install=selectedInstallationTotal(),delivery=selectedDeliveryFee(),grand=product+install+delivery;
+  const product=productTotal(),install=selectedInstallationTotal(),delivery=selectedDeliveryFee(),subtotal=product+install+delivery,discount=welcomeDiscount(product,install,delivery),grand=subtotal-discount;
   const orderData={
     order_number:orderNumber,
     customer_name:form.elements.customer_name.value.trim(),
@@ -208,6 +220,7 @@ async function submitOrder(event){
     product_total:product,
     installation_total:install,
     delivery_fee:delivery,
+    discount_total:discount,
     order_total:grand,
     additional_instructions:form.elements.customer_notes?.value||""
   };
@@ -239,6 +252,7 @@ async function submitOrder(event){
     }
 
     const customerPhone=form.elements.customer_phone.value;
+    if(customerProfile){customerProfile.discountUsed=true;saveCustomerProfile()}
     form.reset();cart=[];saveCart();
     $("#checkoutSummary").innerHTML="<div class='order-success'><strong>Order request sent ✓</strong><span>Your order has been saved successfully.</span></div>";
     $("#checkoutGrandTotal").textContent="R0.00";
@@ -266,6 +280,9 @@ async function copyOrderNumber(orderNumber){
     showCheckoutStatus("Your order number is "+orderNumber+".","success");
   }
 }
+$("#accountBtn").onclick=openAccount;
+$("#closeAccount").onclick=closeAccount;
+$("#accountForm").addEventListener("submit",registerCustomer);
 $("#cartBtn").onclick=openCart;
 $("#trackBtn").onclick=openTrack;
 $("#closeTrack").onclick=closeTrack;
@@ -285,4 +302,5 @@ $("#checkoutForm").addEventListener("submit",submitOrder);
 $("#year").textContent=new Date().getFullYear();
 updateFulfilmentFields();
 updateDeliveryLocations();
+if(customerProfile){syncCustomerToCheckout()}
 renderCategories();renderProducts();renderCart();
