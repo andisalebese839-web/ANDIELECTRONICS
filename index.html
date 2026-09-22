@@ -6,7 +6,7 @@
   <meta name="description" content="Andi Electronics — custom electronics, automation and practical smart solutions.">
   <meta name="theme-color" content="#0b1220">
   <title>Andi Electronics | Electronics & Automation</title>
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 <header class="site-header">
@@ -95,11 +95,41 @@
 </div></footer>
 
 <aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
-  <div class="cart-head"><h2>Your cart</h2><button id="closeCart">×</button></div>
+  <div class="cart-head"><h2>Your cart</h2><button id="closeCart" aria-label="Close cart">×</button></div>
   <div id="cartItems"></div>
-  <div class="cart-bottom"><div><span>Total</span><strong id="cartTotal">R0.00</strong></div><button class="btn primary" id="checkoutBtn">Checkout</button></div>
+  <div class="cart-bottom">
+    <div><span>Products</span><strong id="cartTotal">R0.00</strong></div>
+    <button class="btn primary" id="checkoutBtn">Proceed to checkout</button>
+  </div>
 </aside>
+
+<div class="checkout-modal" id="checkoutModal" aria-hidden="true">
+  <div class="checkout-card">
+    <div class="cart-head"><div><p class="eyebrow">ORDER REQUEST</p><h2>Checkout</h2></div><button id="closeCheckout" aria-label="Close checkout">×</button></div>
+    <div id="checkoutSummary" class="checkout-summary"></div>
+    <form id="checkoutForm" class="checkout-form">
+      <input type="hidden" name="_subject" value="New Andi Electronics Order Request">
+      <input type="hidden" name="order_items" id="orderItemsField">
+      <input type="hidden" name="product_total" id="productTotalField">
+      <input type="hidden" name="installation_total" id="installationTotalField">
+      <input type="hidden" name="order_total" id="orderTotalField">
+      <label>Full name<input required name="customer_name" autocomplete="name" placeholder="Your full name"></label>
+      <label>Email address<input required type="email" name="customer_email" autocomplete="email" placeholder="you@example.com"></label>
+      <label>Phone / WhatsApp<input required type="tel" name="customer_phone" autocomplete="tel" placeholder="079 123 4567"></label>
+      <label>Area / delivery address<input required name="customer_address" autocomplete="street-address" placeholder="Town, suburb or delivery address"></label>
+      <label>Order option<select required name="service_option" id="serviceOption">
+        <option value="products_only">Products only</option>
+        <option value="products_installation">Products + installation</option>
+      </select></label>
+      <label>Additional instructions (optional)<textarea name="customer_notes" rows="4" placeholder="Anything we should know about your order?"></textarea></label>
+      <div class="checkout-total"><span>Estimated total</span><strong id="checkoutGrandTotal">R0.00</strong></div>
+      <p class="checkout-note">This sends an order request to Andi Electronics. Payment is not taken yet; we will confirm the order and installation details with you.</p>
+      <button class="btn primary" id="submitOrderBtn" type="submit">Send order request</button>
+      <div id="checkoutStatus" class="checkout-status" role="status" aria-live="polite"></div>
+    </form>
+  </div>
+</div>
 <div class="overlay" id="overlay"></div>
-<script src="script.js?v=4"></script>
+<script src="script.js?v=5"></script>
 </body>
 </html>
