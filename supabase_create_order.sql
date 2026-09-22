@@ -90,3 +90,36 @@ alter table public.orders
       'Order delivered'
     )
   );
+
+
+-- Admin security for the order dashboard.
+-- Only the authenticated owner account may read/update orders.
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce(auth.jwt()->>'email','') = 'andisalebese839@gmail.com';
+$$;
+
+drop policy if exists "Admins can view orders" on public.orders;
+drop policy if exists "Admins can update orders" on public.orders;
+drop policy if exists "Admins can insert orders" on public.orders;
+
+create policy "Admins can view orders"
+on public.orders
+for select
+to authenticated
+using (public.is_admin());
+
+create policy "Admins can update orders"
+on public.orders
+for update
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+-- Public checkout continues to use the security-definer create_order() RPC,
+-- so no public INSERT policy is needed.
