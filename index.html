@@ -6,7 +6,7 @@
   <meta name="description" content="Andi Electronics — custom electronics, automation and practical smart solutions.">
   <meta name="theme-color" content="#0b1220">
   <title>Andi Electronics | Electronics & Automation</title>
-  <link rel="stylesheet" href="style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=14">
 <style>
 .owner-modal{position:fixed;inset:0;background:rgba(7,13,25,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:1000}
 .owner-modal.open{display:flex}.owner-card{width:min(1100px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:22px;padding:24px;box-shadow:0 24px 80px rgba(0,0,0,.25)}
@@ -206,15 +206,19 @@ function setAccountButton(){
   }
 }
 function showAccountState(){
-  var title=qs("accountTitle"), form=qs("accountForm"), name=qs("accountName"), phone=qs("accountPhone"), status=qs("accountStatus");
+  var title=qs("accountTitle"),form=qs("accountForm");
   if(!customerProfile){
-    title.textContent="Create your account";
-    form.innerHTML='<label>Full name<input id="accountName" required autocomplete="name" placeholder="Your full name"></label><label>Cellphone number<input id="accountPhone" required type="tel" autocomplete="tel" placeholder="079 123 4567"></label><label>Password<input id="accountPassword" required type="password" minlength="6" autocomplete="new-password" placeholder="Create a password (6+ characters)"></label><button class="btn primary" type="submit">Create account & unlock 10%</button><div id="accountStatus" class="account-status" role="status" aria-live="polite"></div>';
-    form.onsubmit=registerNewCustomer;
+    title.textContent="Login";
+    form.innerHTML='<div class="account-tabs"><button type="button" class="account-tab active" id="loginTab">Login</button><button type="button" class="account-tab" id="registerTab">Register</button></div><div id="loginPanel"><p class="account-help">Log in with your name and password.</p><label>Full name<input id="loginName" required autocomplete="username" placeholder="Your full name"></label><label>Password<input id="loginPassword" required type="password" autocomplete="current-password" placeholder="Your password"></label><button class="btn primary" type="submit">Login</button><div id="accountStatus" class="account-status" role="status" aria-live="polite"></div></div><div id="registerPanel" hidden><p class="account-help">New here? Register with your name, cellphone number and a password.</p><label>Full name<input id="registerName" required autocomplete="name" placeholder="Your full name"></label><label>Cellphone number<input id="registerPhone" required type="tel" autocomplete="tel" placeholder="079 123 4567"></label><label>Password<input id="registerPassword" required type="password" minlength="6" autocomplete="new-password" placeholder="Create a password (6+ characters)"></label><button class="btn primary" type="button" id="registerSubmit">Register & unlock 10%</button><div id="registerStatus" class="account-status" role="status" aria-live="polite"></div></div>';
+    form.onsubmit=function(e){e.preventDefault();};
+    qs("loginTab").onclick=function(){qs("loginPanel").hidden=false;qs("registerPanel").hidden=true;qs("loginTab").classList.add("active");qs("registerTab").classList.remove("active")};
+    qs("registerTab").onclick=function(){qs("loginPanel").hidden=true;qs("registerPanel").hidden=false;qs("registerTab").classList.add("active");qs("loginTab").classList.remove("active")};
+    qs("loginPanel").querySelector("button").onclick=loginCustomer;
+    qs("registerSubmit").onclick=registerNewCustomer;
   }else{
     title.textContent="Welcome back, "+String(customerProfile.name||"").split(" ")[0]+"!";
-    form.innerHTML='<div class="account-profile-preview"><div class="customer-avatar">'+initials(customerProfile.name)+'</div><div><strong>'+escapeAccount(customerProfile.name)+'</strong><span>Your Andi Electronics account</span></div></div><label>Password<input id="accountPassword" required type="password" autocomplete="current-password" placeholder="Enter your password"></label><button class="btn primary" type="submit">Log in</button><div id="accountStatus" class="account-status" role="status" aria-live="polite"></div>';
-    form.onsubmit=loginCustomer;
+    form.innerHTML='<div class="account-profile-preview"><div class="customer-avatar">'+initials(customerProfile.name)+'</div><div><strong>'+escapeAccount(customerProfile.name)+'</strong><span>Your Andi Electronics account</span></div></div><label>Password<input id="accountPassword" required type="password" autocomplete="current-password" placeholder="Enter your password"></label><button class="btn primary" type="button" id="loggedLogin">Log in</button><div id="accountStatus" class="account-status" role="status" aria-live="polite"></div>';
+    qs("loggedLogin").onclick=loginCustomer;
   }
 }
 function escapeAccount(v){return String(v||"").replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]})}
