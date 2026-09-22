@@ -280,9 +280,6 @@ async function copyOrderNumber(orderNumber){
     showCheckoutStatus("Your order number is "+orderNumber+".","success");
   }
 }
-$("#accountBtn").onclick=openAccount;
-$("#closeAccount").onclick=closeAccount;
-$("#accountForm").addEventListener("submit",registerCustomer);
 $("#cartBtn").onclick=openCart;
 $("#trackBtn").onclick=openTrack;
 $("#closeTrack").onclick=closeTrack;
