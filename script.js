@@ -6,6 +6,7 @@ const products=[
 {id:5,name:"Automatic Entry Light & Alarm",category:"Security",price:499,install:300,icon:"🚨",image:"https://www.futurelight.co.za/cdn/shop/files/PioLEDLighting-PioLEDLighting-F356S30WOoberIP65LEDSensorFloodlight6000K_3000K.png?v=1761058896&width=1024",desc:"Motion-triggered entrance lighting with an optional alarm."}
 ];
 let cart=JSON.parse(localStorage.getItem("andiCart")||"[]"),active="All";
+const ORDER_STATUS_KEY="andiOrderStatuses";
 const $=s=>document.querySelector(s),money=n=>"R"+Number(n).toFixed(2);
 
 function renderCategories(){
@@ -107,6 +108,12 @@ function updateCheckout(){
   $("#installationTotalField").value=money(install);
   $("#orderTotalField").value=money(grand);
 }
+function getOrderStatuses(){return JSON.parse(localStorage.getItem(ORDER_STATUS_KEY)||"{}")}
+function getOrderStatus(orderNumber){return getOrderStatuses()[orderNumber]||"Order received"}
+function statusSteps(status){const steps=["Order received","Preparing order","Shipped","Out for delivery","Delivered"];const index=Math.max(0,steps.indexOf(status));return steps.map((x,i)=>`<div class="track-step ${i<index?"done":""} ${i===index?"current":""}"><span>${i<index?"✓":i+1}</span><strong>${x}</strong></div>`).join("")}
+function trackOrder(number){const result=$("#trackResult");const clean=number.trim().toUpperCase();const status=getOrderStatus(clean);result.hidden=false;result.innerHTML=`<div class="track-number">${clean}</div><div class="track-status"><strong>Current status: ${status}</strong><span>Order updates will appear here when your order status is updated.</span></div><div class="track-timeline">${statusSteps(status)}</div>`}
+function openTrack(){$("#trackModal").classList.add("open");$("#trackModal").setAttribute("aria-hidden","false");$("#trackResult").hidden=true}
+function closeTrack(){$("#trackModal").classList.remove("open");$("#trackModal").setAttribute("aria-hidden","true")}
 function showCheckoutStatus(message,type){
   $("#checkoutStatus").textContent=message;
   $("#checkoutStatus").className="checkout-status "+type;
@@ -161,6 +168,9 @@ async function copyOrderNumber(orderNumber){
   }
 }
 $("#cartBtn").onclick=openCart;
+$("#trackBtn").onclick=openTrack;
+$("#closeTrack").onclick=closeTrack;
+$("#trackForm").addEventListener("submit",e=>{e.preventDefault();trackOrder($("#trackNumber").value)});
 $("#closeCart").onclick=closeCart;
 $("#overlay").onclick=()=>{closeCart();closeCheckout()};
 $("#search").oninput=renderProducts;
