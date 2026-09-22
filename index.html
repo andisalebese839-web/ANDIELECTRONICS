@@ -38,7 +38,27 @@
 .owner-note{color:#64748b}.owner-message{margin-top:14px;padding:12px;border-radius:10px}.owner-message:empty{display:none}.owner-message.error{background:#fee2e2;color:#991b1b}.owner-message.success{background:#dcfce7;color:#166534}.owner-message.info{background:#e0f2fe;color:#075985}
 .owner-dashboard-head,.owner-order-head{display:flex;justify-content:space-between;gap:16px;align-items:center}.owner-actions{display:flex;gap:8px}.owner-orders{display:grid;gap:14px;margin-top:16px}.owner-order{border:1px solid #e2e8f0;border-radius:16px;padding:18px}.owner-order-head small{display:block;color:#64748b;margin-top:4px}.owner-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}.owner-grid div{background:#f8fafc;padding:10px;border-radius:10px}.owner-grid small{display:block;color:#64748b;margin-bottom:4px}.owner-status{display:flex;gap:10px;align-items:center;margin-top:14px}.owner-status select{max-width:280px}.owner-modal .cart-head{margin-bottom:8px}
 @media(max-width:720px){.owner-grid{grid-template-columns:1fr}.owner-dashboard-head,.owner-order-head{align-items:flex-start;flex-direction:column}.owner-status{align-items:stretch;flex-direction:column}.owner-status select{max-width:none}.owner-card{padding:16px}}
-</style><style>.site-review-box{background:#fff;border:1px solid #dcecff;border-radius:24px;padding:28px;box-shadow:0 12px 40px rgba(18,104,232,.08)}.site-review-summary{display:flex;align-items:center;gap:18px;padding:18px;border-radius:18px;background:#f5faff;border:1px solid #e1efff}.site-review-average{font-size:2.3rem;font-weight:900;color:#1268e8}.site-stars{color:#f5a623;letter-spacing:2px;font-size:1.2rem}.site-review-count{color:#617894}.site-review-list{display:grid;gap:12px;margin:18px 0}.site-review-card,.site-review-empty{padding:18px;border:1px solid #e1efff;border-radius:16px;background:#fff}.site-review-head{display:flex;justify-content:space-between;gap:12px}.site-review-card p{color:#526b88;line-height:1.6;white-space:pre-wrap}.site-review-form{display:grid;gap:12px;margin-top:26px}.site-review-form input,.site-review-form textarea{width:100%;box-sizing:border-box;padding:12px;border:1px solid #cfe1f5;border-radius:12px;font:inherit}.site-rating-picker{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.site-rating-choice{border:1px solid #d7e7f8;background:#fff;border-radius:10px;padding:9px 12px;cursor:pointer;font-weight:800;color:#607894}.site-rating-choice.active{border-color:#f5a623;background:#fff8e8;color:#9a6500}.site-review-status{padding:12px 14px;border-radius:12px;background:#f5faff;color:#526b88}.site-review-status.success{background:#effcf5;color:#087443}.site-review-status.error{background:#fff2f0;color:#b42318}</style></head>
+</style><style>.site-review-box{background:#fff;border:1px solid #dcecff;border-radius:24px;padding:28px;box-shadow:0 12px 40px rgba(18,104,232,.08)}.site-review-summary{display:flex;align-items:center;gap:18px;padding:18px;border-radius:18px;background:#f5faff;border:1px solid #e1efff}.site-review-average{font-size:2.3rem;font-weight:900;color:#1268e8}.site-stars{color:#f5a623;letter-spacing:2px;font-size:1.2rem}.site-review-count{color:#617894}.site-review-list{display:grid;gap:12px;margin:18px 0}.site-review-card,.site-review-empty{padding:18px;border:1px solid #e1efff;border-radius:16px;background:#fff}.site-review-head{display:flex;justify-content:space-between;gap:12px}.site-review-card p{color:#526b88;line-height:1.6;white-space:pre-wrap}.site-review-form{display:grid;gap:12px;margin-top:26px}.site-review-form input,.site-review-form textarea{width:100%;box-sizing:border-box;padding:12px;border:1px solid #cfe1f5;border-radius:12px;font:inherit}.site-rating-picker{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.site-rating-choice{border:1px solid #d7e7f8;background:#fff;border-radius:10px;padding:9px 12px;cursor:pointer;font-weight:800;color:#607894}.site-rating-choice.active{border-color:#f5a623;background:#fff8e8;color:#9a6500}.site-review-status{padding:12px 14px;border-radius:12px;background:#f5faff;color:#526b88}.site-review-status.success{background:#effcf5;color:#087443}.site-review-status.error{background:#fff2f0;color:#b42318}</style><style>
+.service-intro{max-width:760px;color:#526b88;line-height:1.7;margin:0 0 24px}
+.service-action-card{display:flex;flex-direction:column;align-items:flex-start}
+.service-action-card .btn{margin-top:auto}
+.service-cta{margin-top:24px;padding:20px 22px;border:1px solid #cfe5ff;border-radius:18px;background:#f7fbff;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.service-cta span{color:#526b88;flex:1 1 300px}
+.service-request-modal{position:fixed;inset:0;background:rgba(7,13,25,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:1100}
+.service-request-modal.open{display:flex}
+.service-request-card{width:min(720px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:24px;padding:26px;box-shadow:0 24px 80px rgba(0,0,0,.28)}
+.service-request-intro{color:#526b88;line-height:1.6}
+.service-request-form{display:grid;gap:13px}
+.service-request-form label{display:grid;gap:7px;font-weight:700}
+.service-request-form label span{font-weight:400;color:#64748b}
+.service-request-form input,.service-request-form select,.service-request-form textarea{width:100%;box-sizing:border-box;padding:12px 13px;border:1px solid #cfe1f5;border-radius:12px;font:inherit;background:#fff}
+.service-request-form textarea{resize:vertical}
+.service-request-status{padding:12px 14px;border-radius:12px;background:#f5faff;color:#526b88}
+.service-request-status.success{background:#effcf5;color:#087443}
+.service-request-status.error{background:#fff2f0;color:#b42318}
+@media(max-width:720px){.service-request-card{padding:18px}.service-cta{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
 <body>
 <header class="site-header">
   <div class="container nav">
@@ -79,11 +99,30 @@
 
 <section id="services" class="section muted">
   <div class="container">
-    <p class="eyebrow">WHAT WE DO</p><h2>Electronics & automation services</h2>
+    <p class="eyebrow">CUSTOM ELECTRONICS & PROTOTYPING</p>
+    <h2>Have an idea? Tell us what you need.</h2>
+    <p class="service-intro">Choose a service below and send Andi Electronics your idea, problem or project requirements. You do not need to know the technical details — explain what you want the device or system to do, and we will review your request.</p>
     <div class="service-grid">
-      <article><div class="icon">⚙</div><h3>Automation</h3><p>Control systems, sensors, relays and microcontroller-based prototypes.</p></article>
-      <article><div class="icon">⌁</div><h3>Custom electronics</h3><p>Practical circuits and devices designed around a specific problem.</p></article>
-      <article><div class="icon">▣</div><h3>Prototyping</h3><p>Turn an idea into a clear, testable electronics prototype.</p></article>
+      <article class="service-action-card">
+        <div class="icon">⚙</div><h3>Automation</h3>
+        <p>Control systems, sensors, relays, Arduino projects and practical automation solutions.</p>
+        <button class="btn primary service-request-btn" type="button" data-service="Automation">Request automation</button>
+      </article>
+      <article class="service-action-card">
+        <div class="icon">⌁</div><h3>Custom electronics</h3>
+        <p>A custom electronic device, circuit or solution designed around your specific need.</p>
+        <button class="btn primary service-request-btn" type="button" data-service="Custom electronics">Request custom electronics</button>
+      </article>
+      <article class="service-action-card">
+        <div class="icon">▣</div><h3>Prototyping</h3>
+        <p>Turn your idea into a clear, testable prototype that can be discussed, built and improved.</p>
+        <button class="btn primary service-request-btn" type="button" data-service="Prototyping">Request a prototype</button>
+      </article>
+    </div>
+    <div class="service-cta">
+      <strong>Not sure which service you need?</strong>
+      <span>Just tell us the problem you want to solve. We will help identify what needs to be built.</span>
+      <button class="btn ghost service-request-btn" type="button" data-service="Custom electronics / prototyping">Explain my idea</button>
     </div>
   </div>
 </section>
@@ -222,6 +261,39 @@
       <div id="ownerMessage" class="owner-message" role="status" aria-live="polite"></div>
       <div id="ownerOrders" class="owner-orders"><div class="empty">Loading orders...</div></div>
     </div>
+  </div>
+</div>
+<div class="service-request-modal" id="serviceRequestModal" aria-hidden="true">
+  <div class="service-request-card">
+    <div class="cart-head">
+      <div><p class="eyebrow">CUSTOM PROJECT REQUEST</p><h2>Tell us what you need</h2></div>
+      <button type="button" id="closeServiceRequest" aria-label="Close project request">×</button>
+    </div>
+    <p class="service-request-intro">Explain your idea in your own words. We will receive your request and contact you to discuss the design, components, price and next steps.</p>
+    <form id="serviceRequestForm" class="service-request-form" action="https://formspree.io/f/mnpndglk" method="POST">
+      <input type="hidden" name="_subject" value="New Andi Electronics Custom Project Request">
+      <input type="hidden" name="request_type" value="Custom electronics / prototyping">
+      <label>Your name<input required name="name" autocomplete="name" placeholder="Your full name"></label>
+      <label>Cellphone number<input required type="tel" name="phone" autocomplete="tel" placeholder="079 123 4567"></label>
+      <label>Email address <span>(optional)</span><input type="email" name="email" autocomplete="email" placeholder="you@example.com"></label>
+      <label>What service do you need?
+        <select required name="service" id="serviceRequestType">
+          <option value="">Select a service</option>
+          <option>Automation</option>
+          <option>Custom electronics</option>
+          <option>Prototyping</option>
+          <option>Custom electronics / prototyping</option>
+        </select>
+      </label>
+      <label>What do you want us to build or solve?
+        <textarea required name="project_description" rows="6" placeholder="For example: I want a device that detects when a machine stops and records how long it was stopped. Please explain your idea, even if you do not know the technical terms."></textarea>
+      </label>
+      <label>Extra requirements <span>(optional)</span>
+        <textarea name="requirements" rows="4" placeholder="Components you already have, size, power supply, where it will be used, deadline, preferred features, budget, or anything else you think is important."></textarea>
+      </label>
+      <div id="serviceRequestStatus" class="service-request-status" role="status" aria-live="polite">Your request will be sent directly to Andi Electronics.</div>
+      <button class="btn primary" id="submitServiceRequest" type="submit">Submit project request</button>
+    </form>
   </div>
 </div>
 <div class="track-modal" id="trackModal" aria-hidden="true"><div class="track-card"><div class="cart-head"><div><p class="eyebrow">ORDER TRACKING</p><h2>Track your order</h2></div><button type="button" id="closeTrack" aria-label="Close tracking">×</button></div><p class="track-intro">Enter the unique order number you received after placing your order.</p><form id="trackForm" class="track-form"><input id="trackNumber" required placeholder="Example: AE-20260922-7F3A91BC" autocomplete="off"><button class="btn primary" type="submit">Track order</button></form><div id="trackResult" class="track-result" hidden></div></div></div>
@@ -401,6 +473,52 @@ document.addEventListener("DOMContentLoaded",function(){
   byId("ownerLogout").onclick=function(){token="";sessionStorage.removeItem("andiOwnerToken");byId("ownerLogin").hidden=false;byId("ownerDashboard").hidden=true;byId("ownerLoginMessage").textContent=""};
   byId("ownerOrders").addEventListener("click",function(e){var b=e.target.closest(".owner-save");if(b)ownerSave(b)});
 });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  function q(id){return document.getElementById(id)}
+  function openRequest(service){
+    var modal=q("serviceRequestModal");
+    modal.classList.add("open"); modal.setAttribute("aria-hidden","false");
+    var select=q("serviceRequestType");
+    if(service){select.value=service}
+    q("serviceRequestStatus").textContent="Your request will be sent directly to Andi Electronics.";
+    q("serviceRequestStatus").className="service-request-status";
+    setTimeout(function(){q("serviceRequestForm").querySelector("input[name='name']").focus()},80);
+  }
+  function closeRequest(){
+    var modal=q("serviceRequestModal");
+    modal.classList.remove("open"); modal.setAttribute("aria-hidden","true");
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll(".service-request-btn").forEach(function(btn){
+      btn.addEventListener("click",function(){openRequest(btn.dataset.service||"")});
+    });
+    q("closeServiceRequest").addEventListener("click",closeRequest);
+    q("serviceRequestModal").addEventListener("click",function(e){if(e.target===this)closeRequest()});
+    document.addEventListener("keydown",function(e){if(e.key==="Escape")closeRequest()});
+    q("serviceRequestForm").addEventListener("submit",async function(e){
+      e.preventDefault();
+      var form=this,button=q("submitServiceRequest"),status=q("serviceRequestStatus");
+      button.disabled=true; button.textContent="Submitting request...";
+      status.textContent="Sending your project request...";
+      status.className="service-request-status";
+      try{
+        var response=await fetch(form.action,{method:"POST",body:new FormData(form),headers:{"Accept":"application/json"}});
+        if(!response.ok) throw new Error("We could not submit the request right now.");
+        form.reset();
+        status.textContent="Request submitted successfully! 🎉 Your custom project request has been sent to Andi Electronics. We will review your requirements and contact you with the next steps.";
+        status.className="service-request-status success";
+      }catch(err){
+        status.textContent=err.message+" Please try again or contact us on WhatsApp.";
+        status.className="service-request-status error";
+      }finally{
+        button.disabled=false; button.textContent="Submit project request";
+      }
+    });
+  });
 })();
 </script>
 <script src="website-reviews.js?v=1"></script>
