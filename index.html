@@ -117,7 +117,17 @@
       <label>Full name<input required name="customer_name" autocomplete="name" placeholder="Your full name"></label>
       <label>Email address<input required type="email" name="email" autocomplete="email" placeholder="you@example.com"></label>
       <label>Phone / WhatsApp<input required type="tel" name="customer_phone" autocomplete="tel" placeholder="079 123 4567"></label>
-      <label>Area / delivery address<input required name="customer_address" autocomplete="street-address" placeholder="Town, suburb or delivery address"></label>
+      <label>Fulfilment option<select required name="fulfilment_option" id="fulfilmentOption">
+        <option value="collection">Collection — R0</option>
+        <option value="delivery">Delivery</option>
+      </select></label>
+      <label id="deliveryAreaWrap">Delivery area<select name="delivery_area" id="deliveryArea">
+        <option value="local" data-fee="50">Local / Same City — R50</option>
+        <option value="same_province" data-fee="80">Same Province — R80</option>
+        <option value="other_province" data-fee="120">Other Province — R120</option>
+        <option value="remote" data-fee="150">Remote Area — R150</option>
+      </select></label>
+      <label>Area / delivery address<input required name="customer_address" id="customerAddress" autocomplete="street-address" placeholder="Town, suburb or delivery address"></label>
       <label>Order option<select required name="service_option" id="serviceOption">
         <option value="products_only">Products only</option>
         <option value="products_installation">Products + installation</option>
