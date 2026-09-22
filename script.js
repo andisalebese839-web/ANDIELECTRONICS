@@ -42,6 +42,16 @@ function saveCart(){localStorage.setItem("andiCart",JSON.stringify(cart));render
 function productTotal(){return cart.reduce((a,x)=>a+x.price*x.qty,0)}
 function installationTotal(){return cart.reduce((a,x)=>a+x.install*x.qty,0)}
 function selectedInstallationTotal(){return $("#serviceOption")&&$("#serviceOption").value==="products_installation"?installationTotal():0}
+
+function createOrderNumber(){
+  const now=new Date();
+  const date=now.getFullYear().toString()+String(now.getMonth()+1).padStart(2,"0")+String(now.getDate()).padStart(2,"0");
+  const unique=typeof crypto!=="undefined"&&crypto.randomUUID
+    ?crypto.randomUUID().replace(/-/g,"").slice(0,8).toUpperCase()
+    :Math.random().toString(36).slice(2,10).toUpperCase();
+  return "AE-"+date+"-"+unique;
+}
+
 function renderCart(){
   const count=cart.reduce((a,x)=>a+x.qty,0);
   $("#cartCount").textContent=count;
@@ -64,6 +74,7 @@ function openCheckout(){
   closeCart();
   $("#checkoutModal").classList.add("open");
   $("#checkoutModal").setAttribute("aria-hidden","false");
+  $("#orderConfirmation").hidden=true;
   updateCheckout();
 }
 function closeCheckout(){$("#checkoutModal").classList.remove("open");$("#checkoutModal").setAttribute("aria-hidden","true")}
@@ -78,11 +89,6 @@ function updateCheckout(){
   $("#installationTotalField").value=money(install);
   $("#orderTotalField").value=money(grand);
 }
-function buildWhatsAppMessage(){
-  const lines=cart.map(x=>`• ${x.name} × ${x.qty} — ${money(x.price*x.qty)}`);
-  return "Hello Andi Electronics, I would like to order:%0A%0A"+encodeURIComponent(lines.join("\n"))+
-    encodeURIComponent("\n\nProducts: "+money(productTotal())+"\nInstallation: To be confirmed\n\nPlease contact me to confirm the order.");
-}
 function showCheckoutStatus(message,type){
   $("#checkoutStatus").textContent=message;
   $("#checkoutStatus").className="checkout-status "+type;
@@ -90,10 +96,13 @@ function showCheckoutStatus(message,type){
 async function submitOrder(event){
   event.preventDefault();
   if(!cart.length){showCheckoutStatus("Your cart is empty.","error");return}
+  const orderNumber=createOrderNumber();
   updateCheckout();
+  $("#orderNumberField").value=orderNumber;
+  $("#orderSubjectField").value="New Andi Electronics Order — "+orderNumber;
   const form=$("#checkoutForm"),button=$("#submitOrderBtn");
   button.disabled=true;button.textContent="Sending order...";
-  showCheckoutStatus("Sending your order request...","loading");
+  showCheckoutStatus("Creating your order...","loading");
   try{
     const response=await fetch("https://formspree.io/f/mnpndglk",{
       method:"POST",
@@ -101,16 +110,35 @@ async function submitOrder(event){
       body:new FormData(form)
     });
     if(!response.ok)throw new Error("Submission failed");
+    const customerEmail=form.elements.email.value;
+    const customerPhone=form.elements.customer_phone.value;
     form.reset();
     cart=[];
     saveCart();
-    $("#checkoutSummary").innerHTML="<div class='order-success'><strong>Order request sent ✓</strong><span>Thank you! Andi Electronics will contact you to confirm the order and installation details.</span></div>";
+    $("#checkoutSummary").innerHTML="<div class='order-success'><strong>Order request sent ✓</strong><span>Your order has been received by Andi Electronics.</span></div>";
     $("#checkoutGrandTotal").textContent="R0.00";
-    showCheckoutStatus("Order request sent successfully. Check your email for confirmation from Formspree.","success");
+    $("#orderConfirmation").hidden=false;
+    $("#orderConfirmation").innerHTML=`
+      <span>Your unique order number</span>
+      <strong>${orderNumber}</strong>
+      <p>Save this number. We will use it to identify your order.</p>
+      <div class="confirmation-actions">
+        <button type="button" class="small-btn" onclick="copyOrderNumber('${orderNumber}')">Copy order number</button>
+        <a class="small-btn whatsapp-order" target="_blank" rel="noopener" href="https://wa.me/27793234998?text=${encodeURIComponent("Hello Andi Electronics. My order number is "+orderNumber+". My phone number is "+customerPhone+". Please confirm my order.")}">Message us on WhatsApp</a>
+      </div>`;
+    showCheckoutStatus("Order created successfully. Your order number is "+orderNumber+".","success");
   }catch(error){
     showCheckoutStatus("We could not send the order right now. Please try again or order through WhatsApp.","error");
   }finally{
     button.disabled=false;button.textContent="Send order request";
+  }
+}
+async function copyOrderNumber(orderNumber){
+  try{
+    await navigator.clipboard.writeText(orderNumber);
+    showCheckoutStatus("Order number copied: "+orderNumber,"success");
+  }catch(error){
+    showCheckoutStatus("Your order number is "+orderNumber+".","success");
   }
 }
 $("#cartBtn").onclick=openCart;
