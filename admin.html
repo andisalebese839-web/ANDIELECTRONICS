@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Andi Electronics | Admin Orders</title>
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="style.css?v=8">
 <style>
 body{background:#f4f7fb}.admin-wrap{max-width:1180px;margin:0 auto;padding:32px 20px 60px}
 .admin-top{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:24px}
@@ -112,13 +112,13 @@ function orderCard(o){
       '<div><small>Address</small>'+esc(o.delivery_address||"—")+'</div>'+
     '</div>'+
     '<strong>Products</strong><ul class="order-items">'+(itemHtml||"<li>No product details</li>")+'</ul>'+
-    '<div class="status-row"><select id="status-'+esc(o.id)+'">'+options+'</select><button class="btn primary" type="button" onclick="saveStatus(''+esc(o.id)+'',''+esc(o.order_number)+'')">Save status</button></div>'+
+    '<div class="status-row"><select data-status-id="'+esc(o.id)+'">'+options+'</select><button class="btn primary status-save" type="button" data-order-id="'+esc(o.id)+'" data-order-number="'+esc(o.order_number)+'">Save status</button></div>'+
     '</article>';
 }
 
-async function saveStatus(id,orderNumber){
-  const select=$("#status-"+id),newStatus=select.value;
-  const btn=select.nextElementSibling;btn.disabled=true;btn.textContent="Saving...";
+async function saveStatus(id,orderNumber,select,btn){
+  const newStatus=select.value;
+  btn.disabled=true;btn.textContent="Saving...";
   try{
     const r=await fetch(SUPABASE_URL+"/rest/v1/orders?id=eq."+encodeURIComponent(id),{
       method:"PATCH",headers:{...authHeaders(),"Prefer":"return=representation"},
@@ -133,6 +133,12 @@ async function saveStatus(id,orderNumber){
   finally{btn.disabled=false;btn.textContent="Save status"}
 }
 
+$("#ordersList").addEventListener("click",e=>{
+  const btn=e.target.closest(".status-save");
+  if(!btn)return;
+  const select=btn.previousElementSibling;
+  saveStatus(btn.dataset.orderId,btn.dataset.orderNumber,select,btn);
+});
 $("#loginForm").addEventListener("submit",login);
 $("#refreshBtn").onclick=loadOrders;
 $("#logoutBtn").onclick=()=>{accessToken="";sessionStorage.removeItem("andiAdminAccessToken");showLogin()};
