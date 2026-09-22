@@ -149,7 +149,12 @@ function updateCheckout(){
   $("#installationTotalField").value=money(install);
   $("#orderTotalField").value=money(grand);
 }
-function statusSteps(status){const steps=["Order received","Preparing order","Shipped","Out for delivery","Delivered"];const index=Math.max(0,steps.indexOf(status));return steps.map((x,i)=>`<div class="track-step ${i<index?"done":""} ${i===index?"current":""}"><span>${i<index?"✓":i+1}</span><strong>${x}</strong></div>`).join("")}
+function statusSteps(status){
+  const steps=["Order received","Order accepted","Preparing order","Shipped","Out for delivery","Order delivered"];
+  const normalized=status==="Delivered"?"Order delivered":status;
+  const index=Math.max(0,steps.indexOf(normalized));
+  return steps.map((x,i)=>`<div class="track-step ${i<index?"done":""} ${i===index?"current":""}"><span>${i<index?"✓":i+1}</span><strong>${x}</strong></div>`).join("")
+}
 async function trackOrder(number){
   const result=$("#trackResult");
   const clean=number.trim().toUpperCase();
