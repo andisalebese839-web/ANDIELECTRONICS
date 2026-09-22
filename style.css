@@ -88,3 +88,18 @@ footer{background:#f3f9ff!important;border-top:1px solid #dfeefa!important;color
 .hero-type-bottom strong{display:block;font-size:1.05rem;color:#fff;letter-spacing:.01em}
 .hero-type-bottom p{margin:5px 0 0!important;color:rgba(220,241,255,.68)!important;font-size:.82rem!important;letter-spacing:.12em;text-transform:uppercase}
 @media(max-width:900px){.hero-type{min-height:420px!important;padding:30px!important}.hero-type-word{font-size:clamp(3.6rem,15vw,5.8rem)}}
+
+
+/* FINAL CLASSIC TYPOGRAPHY HERO — text only, no robot imagery */
+.hero-type{min-height:500px!important;padding:48px!important;justify-content:space-between!important;background:#ffffff!important;border:1px solid #dfe8f2!important;border-radius:26px!important;box-shadow:0 24px 60px rgba(24,55,93,.10)!important;color:#17345c!important}
+.hero-type:before{inset:18px!important;border:1px solid #edf2f7!important;border-radius:18px!important}
+.hero-type:after{width:180px!important;height:180px!important;right:-75px!important;bottom:-95px!important;border-color:rgba(18,104,232,.12)!important;box-shadow:0 0 0 30px rgba(18,104,232,.025),0 0 0 60px rgba(18,104,232,.018)!important}
+.hero-type-top{color:#71839a!important;font-family:Inter,system-ui,sans-serif!important}
+.hero-type-top span:first-child{font-family:Georgia,"Times New Roman",serif!important;font-size:1.65rem!important;color:#17345c!important}
+.hero-type-word{font-family:Georgia,"Times New Roman",serif!important;font-size:clamp(4rem,7vw,6.5rem)!important;line-height:.88!important;letter-spacing:-.055em!important;color:#17345c!important;text-shadow:none!important}
+.hero-type-word.accent{font-family:Georgia,"Times New Roman",serif!important;font-style:italic!important;color:#1268e8!important;text-shadow:none!important;margin-left:11%!important}
+.hero-type-line{background:#1268e8!important;width:42%!important}
+.hero-type-bottom strong{font-family:Inter,system-ui,sans-serif!important;color:#17345c!important}
+.hero-type-bottom p{font-family:Inter,system-ui,sans-serif!important;color:#71839a!important}
+.hero-robot-photo,.hero-robot-image,.robot-core,.robot-face,.orbit,.node{display:none!important}
+@media(max-width:900px){.hero-type{min-height:420px!important;padding:32px!important}.hero-type-word{font-size:clamp(3.4rem,14vw,5.4rem)!important}}
