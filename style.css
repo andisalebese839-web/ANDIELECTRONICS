@@ -40,3 +40,16 @@ footer{background:#f3f9ff!important;border-top:1px solid #dfeefa!important;color
 /* make WhatsApp a subtle text action instead */
 @media(max-width:900px){.hero-grid{grid-template-columns:1fr!important;gap:40px!important}.hero{padding:65px 0!important}.hero:after{display:none}nav{background:#fff!important;border-top:1px solid #e6f0fa!important;padding:15px!important;box-shadow:0 15px 30px rgba(30,80,130,.08)!important}.nav{min-height:68px!important}.hero h1{font-size:clamp(2.5rem,11vw,4rem)!important}}
 @media(max-width:600px){.section{padding:62px 0!important}.hero-actions{display:grid!important}.hero-actions .btn{width:100%!important}.trust{display:grid!important;gap:8px!important}.welcome-offer{padding:14px!important}.hero-card{padding:16px!important}.robot-core{height:205px!important}}
+
+/* CUSTOMER ACCOUNT — friendly human avatar and login */ 
+.account-profile-preview,.account-success-hero{display:flex;align-items:center;gap:14px;padding:14px 16px;background:#f5faff;border:1px solid #dceafa;border-radius:16px;margin-bottom:16px}
+.account-success-hero{background:linear-gradient(135deg,#effaff,#f5f2ff);border-color:#cfe7fb;padding:18px}
+.account-success-hero strong{display:block;color:#1268e8;font-size:1.05rem}
+.account-success-hero span,.account-profile-preview span{display:block;color:#617894;margin-top:3px}
+.customer-avatar{width:48px;height:48px;min-width:48px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#1268e8,#17c4e7);color:#fff;font-weight:900;letter-spacing:.04em;border:3px solid #e9f6ff;box-shadow:0 7px 18px rgba(18,104,232,.18)}
+.customer-avatar-large{width:68px;height:68px;min-width:68px;font-size:1.25rem}
+.customer-avatar-small{width:30px;height:30px;min-width:30px;font-size:.72rem;border-width:2px;display:inline-grid;margin-right:7px;vertical-align:middle}
+#accountBtn{display:inline-flex!important;align-items:center!important;gap:3px!important}
+.account-status.error{color:#b42318!important;background:#fff2f0!important;border-color:#ffd3ce!important}
+.account-status.success{color:#087443!important;background:#effcf5!important;border-color:#c7efd9!important}
+.account-form label{margin-top:12px}
