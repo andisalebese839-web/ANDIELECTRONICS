@@ -63,14 +63,10 @@ const deliveryLocations={
 };
 function selectedDeliveryFee(){
   const option=$("#fulfilmentOption");
-  if(!option||option.value!=="delivery")return 0;
-  const province=$("#deliveryProvince")?.value||"";
-  if(!province)return 0;
-  const city=$("#deliveryCity")?.value||"";
-  // Base delivery estimate by province; suburb is captured for the final delivery quote.
-  if(province==="Gauteng"||province==="Free State")return 75;
-  if(province==="Eastern Cape"||province==="KwaZulu-Natal"||province==="Limpopo"||province==="Mpumalanga"||province==="North West"||province==="Northern Cape"||province==="Western Cape")return 150;
-  return 180;
+  return option&&option.value==="delivery"?210:0;
+}
+function deliveryChargeBreakdown(){
+  return '<div class="summary-line"><span>Delivery fee</span><strong>R90.00</strong></div><div class="summary-line"><span>Shipping fee</span><strong>R120.00</strong></div>';
 }
 function updateDeliveryLocations(){
   const province=$("#deliveryProvince"),city=$("#deliveryCity"),suburb=$("#deliverySuburb"),area=$("#deliveryArea");
@@ -94,11 +90,15 @@ function updateFulfilmentFields(){
   const delivery=$("#fulfilmentOption")?.value==="delivery";
   const wrap=$("#deliveryAreaWrap"),area=$("#deliveryArea"),address=$("#customerAddress");
   if(wrap)wrap.style.display=delivery?"grid":"none";
-  if(area)area.required=delivery;
+  if(area)area.required=false;
   if(address){
-    address.required=true;
-    address.placeholder=delivery?"Town, suburb or delivery address":"Collection location / area";
+    address.required=delivery;
+    address.placeholder=delivery?"Street, house/unit number":"Collection location / area";
   }
+  ["#deliveryProvince","#deliveryCity","#deliverySuburb"].forEach(selector=>{
+    const field=$(selector);
+    if(field)field.required=delivery;
+  });
 }
 
 function createOrderNumber(){
@@ -142,7 +142,7 @@ function updateCheckout(){
   $("#checkoutSummary").innerHTML=cart.map(x=>`<div><span>${x.name} × ${x.qty}</span><strong>${money(x.price*x.qty)}</strong></div>`).join("")+
     `<div class="summary-line"><span>Products</span><strong>${money(product)}</strong></div>`+
     `<div class="summary-line"><span>Installation</span><strong>${install?money(install):"Not selected"}</strong></div>`+
-    `<div class="summary-line"><span>${fulfilment}</span><strong>${delivery?money(delivery):"R0.00"}</strong></div>`;
+    `${fulfilment==="Delivery"?deliveryChargeBreakdown():`<div class="summary-line"><span>Collection</span><strong>R0.00</strong></div>`}`;
   $("#checkoutGrandTotal").textContent=money(grand);
   $("#orderItemsField").value=cart.map(x=>`${x.name} × ${x.qty} = ${money(x.price*x.qty)}`).join(" | ");
   $("#productTotalField").value=money(product);
@@ -193,7 +193,7 @@ async function submitOrder(event){
   const product=productTotal(),install=selectedInstallationTotal(),delivery=selectedDeliveryFee(),grand=product+install+delivery;
   const orderData={
     order_number:orderNumber,
-    customer_name:form.elements.full_name.value.trim(),
+    customer_name:form.elements.customer_name.value.trim(),
     customer_email:form.elements.email.value.trim(),
     customer_phone:form.elements.customer_phone.value.trim(),
     fulfilment:$("#fulfilmentOption").value==="delivery"?"Delivery":"Collection",
@@ -248,7 +248,7 @@ async function submitOrder(event){
     showCheckoutStatus("Order created successfully. Your order number is "+orderNumber+".","success");
   }catch(error){
     console.error(error);
-    showCheckoutStatus("We could not save the order right now. Please try again or order through WhatsApp.","error");
+    showCheckoutStatus("We could not save the order: "+(error?.message||"Unknown error").slice(0,180),"error");
   }finally{
     button.disabled=false;button.textContent="Send order request";
   }
