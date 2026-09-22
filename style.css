@@ -53,3 +53,5 @@ footer{background:#f3f9ff!important;border-top:1px solid #dfeefa!important;color
 .account-status.error{color:#b42318!important;background:#fff2f0!important;border-color:#ffd3ce!important}
 .account-status.success{color:#087443!important;background:#effcf5!important;border-color:#c7efd9!important}
 .account-form label{margin-top:12px}
+
+.account-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#eef6ff;padding:5px;border-radius:14px;margin-bottom:18px}.account-tab{border:0;background:transparent;color:#55708f;font-weight:800;padding:11px;border-radius:10px;cursor:pointer}.account-tab.active{background:#fff;color:#1268e8;box-shadow:0 4px 12px rgba(18,104,232,.10)}.account-help{color:#617894;font-size:.92rem;line-height:1.5;margin:0 0 12px}.account-form input{width:100%;box-sizing:border-box;min-height:46px;padding:12px 14px;font-size:1rem;display:block}.account-form label{display:block;width:100%;box-sizing:border-box}.account-form button{margin-top:14px}.account-status{margin-top:12px;line-height:1.5}
