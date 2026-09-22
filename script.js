@@ -50,12 +50,46 @@ function saveCart(){localStorage.setItem("andiCart",JSON.stringify(cart));render
 function productTotal(){return cart.reduce((a,x)=>a+x.price*x.qty,0)}
 function installationTotal(){return cart.reduce((a,x)=>a+x.install*x.qty,0)}
 function selectedInstallationTotal(){return $("#serviceOption")&&$("#serviceOption").value==="products_installation"?installationTotal():0}
+const deliveryLocations={
+  "Eastern Cape":["Gqeberha","East London","Mthatha","Bhisho","Kariega","Komani"],
+  "Free State":["Bloemfontein","Welkom","Bethlehem","Sasolburg","Phuthaditjhaba"],
+  "Gauteng":["Johannesburg","Pretoria","Centurion","Midrand","Soweto","Vanderbijlpark","Benoni","Boksburg","Germiston"],
+  "KwaZulu-Natal":["Durban","Pietermaritzburg","Richards Bay","Newcastle","Ladysmith","Ballito"],
+  "Limpopo":["Polokwane","Thohoyandou","Tzaneen","Mokopane","Giyani"],
+  "Mpumalanga":["Mbombela","Emalahleni","Secunda","Middelburg","Nkomazi"],
+  "North West":["Rustenburg","Mahikeng","Klerksdorp","Potchefstroom","Brits"],
+  "Northern Cape":["Kimberley","Upington","Kuruman","De Aar"],
+  "Western Cape":["Cape Town","Stellenbosch","George","Paarl","Worcester","Mossel Bay"]
+};
 function selectedDeliveryFee(){
   const option=$("#fulfilmentOption");
   if(!option||option.value!=="delivery")return 0;
-  const area=$("#deliveryArea");
-  return area?Number(area.selectedOptions[0]?.dataset.fee||0):0;
+  const province=$("#deliveryProvince")?.value||"";
+  if(!province)return 0;
+  const city=$("#deliveryCity")?.value||"";
+  // Base delivery estimate by province; suburb is captured for the final delivery quote.
+  if(province==="Gauteng"||province==="Free State")return 75;
+  if(province==="Eastern Cape"||province==="KwaZulu-Natal"||province==="Limpopo"||province==="Mpumalanga"||province==="North West"||province==="Northern Cape"||province==="Western Cape")return 150;
+  return 180;
 }
+function updateDeliveryLocations(){
+  const province=$("#deliveryProvince"),city=$("#deliveryCity"),suburb=$("#deliverySuburb"),area=$("#deliveryArea");
+  if(!province||!city||!suburb)return;
+  const cities=deliveryLocations[province.value]||[];
+  city.innerHTML=cities.length?'<option value="">Select city / town</option>'+cities.map(x=>`<option>${x}</option>`).join(""):'<option value="">Select province first</option>';
+  city.disabled=!cities.length;
+  suburb.innerHTML='<option value="">Select suburb</option>';
+  suburb.disabled=true;
+  if(area)area.value="";
+}
+function updateDeliverySuburbs(){
+  const city=$("#deliveryCity"),suburb=$("#deliverySuburb"),area=$("#deliveryArea");
+  if(!city||!suburb)return;
+  suburb.disabled=!city.value;
+  suburb.innerHTML=city.value?'<option value="">Select suburb</option><option>Other suburb</option>':'<option value="">Select city first</option>';
+  if(area)area.value=city.value;
+}
+
 function updateFulfilmentFields(){
   const delivery=$("#fulfilmentOption")?.value==="delivery";
   const wrap=$("#deliveryAreaWrap"),area=$("#deliveryArea"),address=$("#customerAddress");
@@ -162,15 +196,15 @@ async function submitOrder(event){
     customer_name:form.elements.full_name.value.trim(),
     customer_email:form.elements.email.value.trim(),
     customer_phone:form.elements.customer_phone.value.trim(),
-    fulfilment:$("#fulfilmentOption").value,
-    delivery_area:$("#deliveryArea").value||"",
+    fulfilment:$("#fulfilmentOption").value==="delivery"?"Delivery":"Collection",
+    delivery_area:[$("#deliveryProvince")?.value,$("#deliveryCity")?.value,$("#deliverySuburb")?.value].filter(Boolean).join(" / "),
     delivery_address:$("#customerAddress").value||"",
     products:cart.map(x=>({id:x.id,name:x.name,qty:x.qty,price:x.price,install:x.install})),
     product_total:product,
     installation_total:install,
     delivery_fee:delivery,
     order_total:grand,
-    additional_instructions:form.elements.additional_instructions?.value||""
+    additional_instructions:form.elements.customer_notes?.value||""
   };
   try{
     const controller=new AbortController();
@@ -239,8 +273,11 @@ $("#checkoutBtn").onclick=openCheckout;
 $("#closeCheckout").onclick=closeCheckout;
 $("#serviceOption").onchange=updateCheckout;
 $("#fulfilmentOption").onchange=()=>{updateFulfilmentFields();updateCheckout()};
-$("#deliveryArea").onchange=updateCheckout;
+$("#deliveryProvince").onchange=()=>{updateDeliveryLocations();updateCheckout()};
+$("#deliveryCity").onchange=()=>{updateDeliverySuburbs();updateCheckout()};
+$("#deliverySuburb").onchange=updateCheckout;
 $("#checkoutForm").addEventListener("submit",submitOrder);
 $("#year").textContent=new Date().getFullYear();
 updateFulfilmentFields();
+updateDeliveryLocations();
 renderCategories();renderProducts();renderCart();
