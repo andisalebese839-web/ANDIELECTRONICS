@@ -32,7 +32,7 @@ function renderProducts(){
     <h3>${p.name}</h3>
     <p>${p.desc}</p>
     <div class="product-meta"><span class="price">${money(p.price)}</span><span class="install">Installation from ${money(p.install)}</span></div>
-    <div class="product-row"><button class="small-btn" onclick="addToCart(${p.id})">Add to cart</button><a class="quote-link" href="#contact">Ask about customization</a></div>
+    <div class="product-row"><button class="small-btn" onclick="addToCart(${p.id})">Add to cart</button><a class="small-btn product-view-link" href="${{"1":"automatic-night-light.html","2":"motion-sensor-light.html","3":"water-level-alarm.html","4":"door-window-alarm.html","5":"automatic-entry-light-alarm.html"}[p.id]}">View product</a><a class="quote-link" href="#contact">Ask about customization</a></div>
   </article>`).join(""):'<p class="empty">No products found.</p>';
 }
 function setCategory(c){active=c;renderCategories();renderProducts()}
