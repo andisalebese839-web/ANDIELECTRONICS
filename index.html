@@ -7,7 +7,14 @@
   <meta name="theme-color" content="#0b1220">
   <title>Andi Electronics | Electronics & Automation</title>
   <link rel="stylesheet" href="style.css?v=7">
-</head>
+<style>
+.owner-modal{position:fixed;inset:0;background:rgba(7,13,25,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:1000}
+.owner-modal.open{display:flex}.owner-card{width:min(1100px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:22px;padding:24px;box-shadow:0 24px 80px rgba(0,0,0,.25)}
+.owner-card label{display:grid;gap:7px;font-weight:700;margin:12px 0}.owner-card input,.owner-card select{width:100%;box-sizing:border-box;padding:12px;border:1px solid #d8dee8;border-radius:10px;font:inherit}
+.owner-note{color:#64748b}.owner-message{margin-top:14px;padding:12px;border-radius:10px}.owner-message:empty{display:none}.owner-message.error{background:#fee2e2;color:#991b1b}.owner-message.success{background:#dcfce7;color:#166534}.owner-message.info{background:#e0f2fe;color:#075985}
+.owner-dashboard-head,.owner-order-head{display:flex;justify-content:space-between;gap:16px;align-items:center}.owner-actions{display:flex;gap:8px}.owner-orders{display:grid;gap:14px;margin-top:16px}.owner-order{border:1px solid #e2e8f0;border-radius:16px;padding:18px}.owner-order-head small{display:block;color:#64748b;margin-top:4px}.owner-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}.owner-grid div{background:#f8fafc;padding:10px;border-radius:10px}.owner-grid small{display:block;color:#64748b;margin-bottom:4px}.owner-status{display:flex;gap:10px;align-items:center;margin-top:14px}.owner-status select{max-width:280px}.owner-modal .cart-head{margin-bottom:8px}
+@media(max-width:720px){.owner-grid{grid-template-columns:1fr}.owner-dashboard-head,.owner-order-head{align-items:flex-start;flex-direction:column}.owner-status{align-items:stretch;flex-direction:column}.owner-status select{max-width:none}.owner-card{padding:16px}}
+</style></head>
 <body>
 <header class="site-header">
   <div class="container nav">
@@ -145,15 +152,116 @@
   </div>
 </div>
 <div class="overlay" id="overlay"></div>
+
+<!-- Private owner area: hidden until the owner uses Alt + Shift + A -->
+<div class="owner-modal" id="ownerModal" aria-hidden="true">
+  <div class="owner-card">
+    <div class="cart-head">
+      <div><p class="eyebrow">ANDI ELECTRONICS • OWNER</p><h2>Owner dashboard</h2></div>
+      <button type="button" id="closeOwner" aria-label="Close owner area">×</button>
+    </div>
+
+    <div id="ownerLogin">
+      <p class="owner-note">This private area is for the business owner only.</p>
+      <label>Email address<input id="ownerEmail" type="email" value="andisalebese839@gmail.com" autocomplete="username"></label>
+      <label>Password<input id="ownerPassword" type="password" autocomplete="current-password" placeholder="Your private password"></label>
+      <button class="btn primary" id="ownerLoginBtn" type="button">Sign in</button>
+      <div id="ownerLoginMessage" class="owner-message" role="status" aria-live="polite"></div>
+    </div>
+
+    <div id="ownerDashboard" hidden>
+      <div class="owner-dashboard-head">
+        <div><strong>Customer orders</strong><span id="ownerOrderCount"></span></div>
+        <div class="owner-actions"><button class="btn ghost" id="ownerRefresh" type="button">Refresh</button><button class="btn primary" id="ownerLogout" type="button">Log out</button></div>
+      </div>
+      <div id="ownerMessage" class="owner-message" role="status" aria-live="polite"></div>
+      <div id="ownerOrders" class="owner-orders"><div class="empty">Loading orders...</div></div>
+    </div>
+  </div>
+</div>
 <div class="track-modal" id="trackModal" aria-hidden="true"><div class="track-card"><div class="cart-head"><div><p class="eyebrow">ORDER TRACKING</p><h2>Track your order</h2></div><button type="button" id="closeTrack" aria-label="Close tracking">×</button></div><p class="track-intro">Enter the unique order number you received after placing your order.</p><form id="trackForm" class="track-form"><input id="trackNumber" required placeholder="Example: AE-20260922-7F3A91BC" autocomplete="off"><button class="btn primary" type="submit">Track order</button></form><div id="trackResult" class="track-result" hidden></div></div></div>
-<script src="script.js?v=7"></script>
+<script src="script.js?v=8"></script>
 <script>
-document.addEventListener("keydown", function(e){
-  if(e.altKey && e.shiftKey && e.key.toLowerCase()==="a"){
-    e.preventDefault();
-    window.open("admin.html","_blank","noopener");
+(function(){
+"use strict";
+var SUPA="https://qheysduwchwjfxquglxu.supabase.co";
+var KEY="sb_publishable_folUp2DzQKjcMdhrobmhEQ_PWAE9wkn";
+var token=sessionStorage.getItem("andiOwnerToken")||"";
+var statuses=["Order received","Order accepted","Preparing order","Shipped","Out for delivery","Order delivered"];
+function byId(id){return document.getElementById(id)}
+function ownerShow(el,msg,type){el.textContent=msg;el.className="owner-message "+type}
+function ownerHeaders(){return {"apikey":KEY,"Authorization":"Bearer "+token,"Content-Type":"application/json","Accept":"application/json"}}
+function escOwner(v){return String(v==null?"":v).replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[ch]})}
+function ownerMoney(v){return "R"+Number(v||0).toFixed(2)}
+function openOwner(){
+  byId("ownerModal").classList.add("open");
+  byId("ownerModal").setAttribute("aria-hidden","false");
+  if(token){showOwnerDashboard();}else{byId("ownerLogin").hidden=false;byId("ownerDashboard").hidden=true;setTimeout(function(){byId("ownerPassword").focus()},100)}
+}
+function closeOwner(){byId("ownerModal").classList.remove("open");byId("ownerModal").setAttribute("aria-hidden","true")}
+function showOwnerDashboard(){byId("ownerLogin").hidden=true;byId("ownerDashboard").hidden=false;loadOwnerOrders()}
+async function ownerLogin(){
+  var btn=byId("ownerLoginBtn"),msg=byId("ownerLoginMessage"),email=byId("ownerEmail").value.trim(),password=byId("ownerPassword").value;
+  if(!email||!password){ownerShow(msg,"Please enter your email and password.","error");return}
+  btn.disabled=true;btn.textContent="Signing in...";
+  ownerShow(msg,"Connecting securely...","info");
+  try{
+    var response=await fetch(SUPA+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"apikey":KEY,"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({email:email,password:password})});
+    var raw=await response.text(),data={};
+    try{data=raw?JSON.parse(raw):{}}catch(e){}
+    if(!response.ok)throw new Error(data.error_description||data.msg||data.message||("Sign-in failed ("+response.status+")."));
+    if(!data.access_token)throw new Error("No login session was returned.");
+    token=data.access_token;sessionStorage.setItem("andiOwnerToken",token);byId("ownerPassword").value="";
+    ownerShow(msg,"Signed in successfully.","success");showOwnerDashboard();
+  }catch(err){ownerShow(msg,err.message||"Sign-in failed.","error")}
+  finally{btn.disabled=false;btn.textContent="Sign in"}
+}
+async function loadOwnerOrders(){
+  var list=byId("ownerOrders");list.innerHTML='<div class="empty">Loading orders...</div>';
+  try{
+    var response=await fetch(SUPA+"/rest/v1/orders?select=*&order=created_at.desc",{headers:ownerHeaders()});
+    var raw=await response.text(),data=[];
+    try{data=raw?JSON.parse(raw):[];}catch(e){}
+    if(!response.ok)throw new Error(data.message||data.hint||data.details||("Could not load orders ("+response.status+")."));
+    byId("ownerOrderCount").textContent=" ("+data.length+")";
+    if(!data.length){list.innerHTML='<div class="empty">No customer orders yet.</div>';return}
+    list.innerHTML=data.map(ownerCard).join("");
+  }catch(err){
+    list.innerHTML='<div class="empty">'+escOwner(err.message)+'</div>';
+    ownerShow(byId("ownerMessage"),err.message,"error");
+    if(/401|403|jwt|token|permission/i.test(err.message)){token="";sessionStorage.removeItem("andiOwnerToken");byId("ownerLogin").hidden=false;byId("ownerDashboard").hidden=true}
   }
+}
+function ownerCard(o){
+  var items=[];try{items=Array.isArray(o.products)?o.products:JSON.parse(o.products||"[]")}catch(e){}
+  var current=o.status==="Delivered"?"Order delivered":o.status;
+  var opts=statuses.map(function(s){return '<option value="'+escOwner(s)+'" '+(s===current?"selected":"")+'>'+escOwner(s)+'</option>'}).join("");
+  return '<article class="owner-order"><div class="owner-order-head"><div><strong>'+escOwner(o.order_number)+'</strong><small>'+escOwner(new Date(o.created_at).toLocaleString())+'</small></div><strong>'+ownerMoney(o.order_total)+'</strong></div>'+
+  '<div class="owner-grid"><div><small>Customer</small>'+escOwner(o.customer_name)+'</div><div><small>Email</small>'+escOwner(o.customer_email)+'</div><div><small>Phone</small>'+escOwner(o.customer_phone)+'</div><div><small>Fulfilment</small>'+escOwner(o.fulfilment)+'</div><div><small>Area</small>'+escOwner(o.delivery_area||"Collection")+'</div><div><small>Address</small>'+escOwner(o.delivery_address||"—")+'</div></div>'+
+  '<strong>Products</strong><ul>'+items.map(function(x){return '<li>'+escOwner(x.name)+' × '+escOwner(x.qty)+'</li>'}).join("")+'</ul>'+
+  '<div class="owner-status"><select>'+opts+'</select><button class="btn primary owner-save" type="button" data-id="'+escOwner(o.id)+'" data-number="'+escOwner(o.order_number)+'">Save status</button></div></article>';
+}
+async function ownerSave(btn){
+  var select=btn.previousElementSibling,id=btn.dataset.id,num=btn.dataset.number;
+  btn.disabled=true;btn.textContent="Saving...";
+  try{
+    var response=await fetch(SUPA+"/rest/v1/orders?id=eq."+encodeURIComponent(id),{method:"PATCH",headers:Object.assign({},ownerHeaders(),{"Prefer":"return=representation"}),body:JSON.stringify({status:select.value,updated_at:new Date().toISOString()})});
+    var raw=await response.text(),data=[];try{data=raw?JSON.parse(raw):[]}catch(e){}
+    if(!response.ok)throw new Error(data.message||data.hint||data.details||("Could not update order ("+response.status+")."));
+    ownerShow(byId("ownerMessage"),num+" updated to "+select.value+".","success");loadOwnerOrders();
+  }catch(err){ownerShow(byId("ownerMessage"),"Could not update "+num+": "+err.message,"error")}
+  finally{btn.disabled=false;btn.textContent="Save status"}
+}
+document.addEventListener("DOMContentLoaded",function(){
+  document.addEventListener("keydown",function(e){if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==="a"){e.preventDefault();openOwner()}});
+  byId("closeOwner").onclick=closeOwner;
+  byId("ownerLoginBtn").onclick=ownerLogin;
+  byId("ownerPassword").addEventListener("keydown",function(e){if(e.key==="Enter")ownerLogin()});
+  byId("ownerRefresh").onclick=loadOwnerOrders;
+  byId("ownerLogout").onclick=function(){token="";sessionStorage.removeItem("andiOwnerToken");byId("ownerLogin").hidden=false;byId("ownerDashboard").hidden=true;byId("ownerLoginMessage").textContent=""};
+  byId("ownerOrders").addEventListener("click",function(e){var b=e.target.closest(".owner-save");if(b)ownerSave(b)});
 });
+})();
 </script>
 </body>
 </html>
