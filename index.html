@@ -180,7 +180,96 @@
   </div>
 </div>
 <div class="track-modal" id="trackModal" aria-hidden="true"><div class="track-card"><div class="cart-head"><div><p class="eyebrow">ORDER TRACKING</p><h2>Track your order</h2></div><button type="button" id="closeTrack" aria-label="Close tracking">×</button></div><p class="track-intro">Enter the unique order number you received after placing your order.</p><form id="trackForm" class="track-form"><input id="trackNumber" required placeholder="Example: AE-20260922-7F3A91BC" autocomplete="off"><button class="btn primary" type="submit">Track order</button></form><div id="trackResult" class="track-result" hidden></div></div></div>
-<script src="script.js?v=9"></script>
+<script src="script.js?v=10"></script>
+<script>
+(function(){
+"use strict";
+function qs(id){return document.getElementById(id)}
+function initials(name){return String(name||"").trim().split(/\s+/).filter(Boolean).slice(0,2).map(function(x){return x[0].toUpperCase()}).join("")||"A"}
+async function hashPassword(value){
+  if(window.crypto&&crypto.subtle){
+    var bytes=new TextEncoder().encode(value);
+    var hash=await crypto.subtle.digest("SHA-256",bytes);
+    return Array.from(new Uint8Array(hash)).map(function(b){return b.toString(16).padStart(2,"0")}).join("");
+  }
+  return btoa(unescape(encodeURIComponent(value)));
+}
+function saveProfile(){localStorage.setItem("andiCustomerProfile",JSON.stringify(customerProfile))}
+function setAccountButton(){
+  var b=qs("accountBtn"); if(!b)return;
+  if(customerProfile){
+    b.innerHTML='<span class="customer-avatar customer-avatar-small">'+initials(customerProfile.name)+'</span><span>'+String(customerProfile.name||"").split(" ")[0]+'</span>';
+    b.setAttribute("aria-label","Open account for "+customerProfile.name);
+  }else{
+    b.innerHTML="Account";
+    b.setAttribute("aria-label","Create or log in to your account");
+  }
+}
+function showAccountState(){
+  var title=qs("accountTitle"), form=qs("accountForm"), name=qs("accountName"), phone=qs("accountPhone"), status=qs("accountStatus");
+  if(!customerProfile){
+    title.textContent="Create your account";
+    form.innerHTML='<label>Full name<input id="accountName" required autocomplete="name" placeholder="Your full name"></label><label>Cellphone number<input id="accountPhone" required type="tel" autocomplete="tel" placeholder="079 123 4567"></label><label>Password<input id="accountPassword" required type="password" minlength="6" autocomplete="new-password" placeholder="Create a password (6+ characters)"></label><button class="btn primary" type="submit">Create account & unlock 10%</button><div id="accountStatus" class="account-status" role="status" aria-live="polite"></div>';
+    form.onsubmit=registerNewCustomer;
+  }else{
+    title.textContent="Welcome back, "+String(customerProfile.name||"").split(" ")[0]+"!";
+    form.innerHTML='<div class="account-profile-preview"><div class="customer-avatar">'+initials(customerProfile.name)+'</div><div><strong>'+escapeAccount(customerProfile.name)+'</strong><span>Your Andi Electronics account</span></div></div><label>Password<input id="accountPassword" required type="password" autocomplete="current-password" placeholder="Enter your password"></label><button class="btn primary" type="submit">Log in</button><div id="accountStatus" class="account-status" role="status" aria-live="polite"></div>';
+    form.onsubmit=loginCustomer;
+  }
+}
+function escapeAccount(v){return String(v||"").replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]})}
+async function registerNewCustomer(e){
+  e.preventDefault();
+  var name=qs("accountName").value.trim(),phone=qs("accountPhone").value.trim(),password=qs("accountPassword").value,status=qs("accountStatus");
+  if(password.length<6){status.textContent="Please choose a password with at least 6 characters.";status.className="account-status error";return}
+  var hash=await hashPassword(password);
+  customerProfile={name:name,phone:phone,passwordHash:hash,discountUsed:false,registeredAt:new Date().toISOString()};
+  saveProfile();setAccountButton();
+  status.textContent="Congratulations! 🎉 You have 10% OFF your first order.";
+  status.className="account-status success";
+  setTimeout(function(){showLoggedInAccount()},450);
+}
+async function loginCustomer(e){
+  e.preventDefault();
+  var password=qs("accountPassword").value,status=qs("accountStatus"),hash=await hashPassword(password);
+  if(hash!==customerProfile.passwordHash){status.textContent="Incorrect password. Please try again.";status.className="account-status error";return}
+  status.textContent="";
+  showLoggedInAccount();
+}
+function showLoggedInAccount(){
+  var form=qs("accountForm"),title=qs("accountTitle");
+  title.textContent="Congratulations, "+String(customerProfile.name||"").split(" ")[0]+"! 🎉";
+  var ready=!customerProfile.discountUsed;
+  form.innerHTML='<div class="account-success-hero"><div class="customer-avatar customer-avatar-large">'+initials(customerProfile.name)+'</div><div><strong>Congratulations! 🎉</strong><span>'+ (ready ? "You have 10% OFF your first order." : "Your first-order 10% discount has already been used.") +'</span></div></div><div class="account-profile-preview"><div class="customer-avatar">'+initials(customerProfile.name)+'</div><div><strong>'+escapeAccount(customerProfile.name)+'</strong><span>'+escapeAccount(customerProfile.phone)+'</span></div></div><button class="btn primary" type="button" id="continueShoppingBtn">Continue shopping</button><div id="accountStatus" class="account-status success">'+(ready?"Your 10% discount will be applied automatically at checkout.":"Your account is ready for your next order.")+'</div>';
+  qs("continueShoppingBtn").onclick=function(){closeAccount();document.getElementById("shop").scrollIntoView({behavior:"smooth"})};
+  setAccountButton();
+  if(typeof syncCustomerToCheckout==="function")syncCustomerToCheckout();
+  if(typeof updateCheckout==="function")updateCheckout();
+}
+function enhancedOpenAccount(){
+  qs("accountModal").classList.add("open");qs("accountModal").setAttribute("aria-hidden","false");showAccountState();
+}
+function enhancedCloseAccount(){qs("accountModal").classList.remove("open");qs("accountModal").setAttribute("aria-hidden","true")}
+function enhancedSync(){
+  if(!customerProfile)return;
+  var n=qs("checkoutCustomerName"),p=qs("checkoutCustomerPhone"),note=qs("accountCheckoutNote");
+  if(n)n.value=customerProfile.name||"";
+  if(p)p.value=customerProfile.phone||"";
+  if(n)n.readOnly=true;if(p)p.readOnly=true;
+  if(note)note.textContent=customerProfile.discountUsed?"Your first-order 10% discount has already been used.":"Welcome back, "+customerProfile.name+" — your 10% first-order discount is active.";
+}
+document.addEventListener("DOMContentLoaded",function(){
+  setAccountButton();
+  qs("accountBtn").onclick=enhancedOpenAccount;
+  qs("closeAccount").onclick=enhancedCloseAccount;
+  if(typeof syncCustomerToCheckout==="function"){
+    var oldSync=syncCustomerToCheckout;
+    window.syncCustomerToCheckout=enhancedSync;
+  }
+  if(customerProfile){enhancedSync()}
+});
+})();
+</script>
 <script>
 (function(){
 "use strict";
