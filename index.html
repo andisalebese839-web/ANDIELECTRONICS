@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Andi Electronics — custom electronics, automation and practical smart solutions.">
+  <meta name="theme-color" content="#0b1220">
+  <title>Andi Electronics | Electronics & Automation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href="#home">ANDI<span>ELECTRONICS</span></a>
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+    <nav id="navLinks">
+      <a href="#home">Home</a><a href="#shop">Shop</a><a href="#services">Services</a><a href="#about">About</a><a href="#contact">Contact</a>
+      <button class="cart-btn" id="cartBtn">Cart <span id="cartCount">0</span></button>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section id="home" class="hero">
+  <div class="container hero-grid">
+    <div>
+      <p class="eyebrow">SMART • PRACTICAL • INNOVATIVE</p>
+      <h1>Electronics that solve <span>real problems.</span></h1>
+      <p class="hero-text">Custom electronics, automation projects and practical technology for homes, businesses and growing industries.</p>
+      <div class="hero-actions"><a class="btn primary" href="#shop">Explore products</a><a class="btn ghost" href="#contact">Request a project</a></div>
+      <div class="trust"><span>✓ Custom solutions</span><span>✓ South African business</span><span>✓ Built with purpose</span></div>
+    </div>
+    <div class="hero-card">
+      <div class="circuit"><span>+</span><i></i><b></b><em></em></div>
+      <h3>Build • Automate • Improve</h3>
+      <p>From small electronic products to automation prototypes.</p>
+    </div>
+  </div>
+</section>
+
+<section id="shop" class="section">
+  <div class="container">
+    <div class="section-head"><div><p class="eyebrow">CATALOGUE</p><h2>Featured products</h2></div><input id="search" class="search" type="search" placeholder="Search products..."></div>
+    <div class="chips" id="categories"></div>
+    <div class="product-grid" id="productGrid"></div>
+  </div>
+</section>
+
+<section id="services" class="section muted">
+  <div class="container">
+    <p class="eyebrow">WHAT WE DO</p><h2>Electronics & automation services</h2>
+    <div class="service-grid">
+      <article><div class="icon">⚙</div><h3>Automation</h3><p>Control systems, sensors, relays and microcontroller-based prototypes.</p></article>
+      <article><div class="icon">⌁</div><h3>Custom electronics</h3><p>Practical circuits and devices designed around a specific problem.</p></article>
+      <article><div class="icon">▣</div><h3>Prototyping</h3><p>Turn an idea into a clear, testable electronics prototype.</p></article>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="section">
+  <div class="container about-grid">
+    <div><p class="eyebrow">ABOUT ANDI ELECTRONICS</p><h2>Technology made practical.</h2><p>Andi Electronics is focused on accessible electronics, automation and useful products. The goal is simple: understand the problem first, then build technology that makes the solution easier.</p></div>
+    <div class="stats"><div><strong>01</strong><span>Understand</span></div><div><strong>02</strong><span>Design</span></div><div><strong>03</strong><span>Build</span></div><div><strong>04</strong><span>Improve</span></div></div>
+  </div>
+</section>
+
+<section id="contact" class="section muted">
+  <div class="container contact-grid">
+    <div><p class="eyebrow">LET'S BUILD</p><h2>Have an electronics idea?</h2><p>Tell us what you want to build. We can turn the idea into a clear project brief.</p></div>
+    <form id="contactForm" class="contact-form">
+      <input required name="name" placeholder="Your name"><input required type="email" name="email" placeholder="Email address"><textarea required name="message" rows="5" placeholder="Tell us about your project"></textarea>
+      <button class="btn primary" type="submit">Send enquiry</button><small id="formStatus"></small>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer><div class="container footer"><div><a class="brand" href="#home">ANDI<span>ELECTRONICS</span></a><p>Electronics & automation solutions.</p></div><div><p>© <span id="year"></span> Andi Electronics</p><p><a href="#contact">Contact us</a> · <a href="#shop">Shop</a></p></div></div></footer>
+
+<aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
+  <div class="cart-head"><h2>Your cart</h2><button id="closeCart">×</button></div>
+  <div id="cartItems"></div>
+  <div class="cart-bottom"><div><span>Total</span><strong id="cartTotal">R0.00</strong></div><button class="btn primary" id="checkoutBtn">Checkout</button></div>
+</aside>
+<div class="overlay" id="overlay"></div>
+<script src="script.js"></script>
+</body>
+</html>
