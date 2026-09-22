@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://andisalebese839-web.github.io/ANDIELECTRONICS/sitemap.xml
