@@ -21,5 +21,4 @@ function closeCart(){$("#cartDrawer").classList.remove("open");$("#overlay").cla
 $("#cartBtn").onclick=openCart;$("#closeCart").onclick=closeCart;$("#overlay").onclick=closeCart;$("#search").oninput=renderProducts;
 $("#menuBtn").onclick=()=>$("#navLinks").classList.toggle("show");
 $("#checkoutBtn").onclick=()=>{if(!cart.length){alert("Your cart is empty.");return}alert("Checkout is ready to connect to your payment provider. Your cart is saved in this browser.");};
-$("#contactForm").onsubmit=e=>{e.preventDefault();$("#formStatus").textContent="Thanks! Your enquiry has been captured. Connect a Formspree endpoint in script.js to receive submissions.";e.target.reset()};
 $("#year").textContent=new Date().getFullYear();renderCategories();renderProducts();renderCart();
