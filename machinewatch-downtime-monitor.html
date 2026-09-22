@@ -7,7 +7,7 @@
 <meta name="description" content="MachineWatch Downtime Monitor from Andi Electronics. Real-time machine-state monitoring that records operating and downtime periods. R2,499 excluding installation.">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://andisalebese839-web.github.io/ANDIELECTRONICS/machinewatch-downtime-monitor.html">
-<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="style.css?v=15">
 <script type="application/ld+json">
 {
   "@context":"https://schema.org",
@@ -29,8 +29,7 @@
 .spec-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:22px 0}
 .spec{padding:14px;border-radius:14px;background:#f5faff;border:1px solid #e1efff}
 .spec strong{display:block;color:#173b63;margin-bottom:4px}.spec span{color:#607894}
-.review-list{display:grid;gap:12px;margin:18px 0}.review-empty{padding:18px;border-radius:16px;background:#f7fbff;color:#617894}
-.review-form{display:grid;gap:12px}.review-form input,.review-form textarea{width:100%;box-sizing:border-box;padding:12px;border:1px solid #cfe1f5;border-radius:12px;font:inherit}.review-form button{width:max-content}
+.review-summary{display:flex;align-items:center;gap:18px;padding:18px;border-radius:18px;background:#f5faff;border:1px solid #e1efff;margin:18px 0}.review-score{font-size:2.2rem;font-weight:900;color:#1268e8}.stars{color:#f5a623;letter-spacing:2px;font-size:1.15rem}.review-count{color:#617894}.review-list{display:grid;gap:12px;margin:18px 0}.review-empty{padding:18px;border-radius:16px;background:#f7fbff;color:#617894}.review-card{padding:18px;border:1px solid #e1efff;border-radius:16px;background:#fff}.review-card-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.review-card-name{font-weight:900;color:#173b63}.review-date{font-size:.82rem;color:#7a8da6}.review-text{margin:10px 0 0;color:#526b88;line-height:1.65;white-space:pre-wrap}.review-form{display:grid;gap:12px}.review-form input,.review-form textarea{width:100%;box-sizing:border-box;padding:12px;border:1px solid #cfe1f5;border-radius:12px;font:inherit}.star-picker{display:flex;gap:6px;flex-wrap:wrap}.star-choice{border:1px solid #d7e7f8;background:#fff;border-radius:10px;padding:9px 12px;cursor:pointer;font-weight:800;color:#607894}.star-choice.active{border-color:#f5a623;background:#fff8e8;color:#9a6500}.review-status{padding:12px 14px;border-radius:12px;background:#f5faff;color:#526b88}.review-status.success{background:#effcf5;color:#087443}.review-status.error{background:#fff2f0;color:#b42318}.review-form button{width:max-content}
 @media(max-width:800px){.machine-hero{grid-template-columns:1fr}.machine-visual{min-height:240px}.spec-grid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -65,17 +64,21 @@
   <section class="review-panel" style="margin-top:28px">
     <p class="eyebrow">CUSTOMER REVIEWS</p>
     <h2>Reviews from verified customers</h2>
-    <div class="review-list">
-      <div class="review-empty">No customer reviews yet. Once customers purchase and use MachineWatch, verified reviews can be published here.</div>
-    </div>
-    <h3>Want to review MachineWatch?</h3>
-    <p class="machine-note">Reviews will be published after purchase verification. We do not publish invented or unverified customer testimonials.</p>
-    <form class="review-form" onsubmit="return false">
-      <input type="text" placeholder="Your name" aria-label="Your name" disabled>
-      <textarea rows="4" placeholder="Your review" aria-label="Your review" disabled></textarea>
-      <button class="btn ghost" type="button" disabled>Reviews open after verified purchase</button>
+    <div class="review-summary"><div class="review-score" id="reviewAverage">—</div><div><div class="stars" id="reviewAverageStars">☆☆☆☆☆</div><div class="review-count" id="reviewCount">Loading reviews…</div></div></div>
+    <div class="review-list" id="reviewList"><div class="review-empty">Loading customer reviews…</div></div>
+    <h3>Have you purchased MachineWatch?</h3>
+    <p class="machine-note">Enter your order number and cellphone number. We verify the purchase before accepting the review. Your review will be held for approval before it appears publicly.</p>
+    <form class="review-form" id="reviewForm">
+      <input id="reviewName" type="text" placeholder="Your name" required>
+      <input id="reviewOrder" type="text" placeholder="Order number (example: AE-20260922-AB12CD34)" required>
+      <input id="reviewPhone" type="tel" placeholder="Cellphone number used on the order" required>
+      <div><label style="display:block;font-weight:800;color:#345474;margin-bottom:8px">Your rating</label><div class="star-picker" id="starPicker"><button type="button" class="star-choice" data-rating="1">★ 1</button><button type="button" class="star-choice" data-rating="2">★ 2</button><button type="button" class="star-choice" data-rating="3">★ 3</button><button type="button" class="star-choice" data-rating="4">★ 4</button><button type="button" class="star-choice" data-rating="5">★ 5</button></div><input id="reviewRating" type="hidden" value=""></div>
+      <textarea id="reviewText" rows="5" placeholder="Tell us about your MachineWatch experience…" required minlength="5"></textarea>
+      <div class="review-status" id="reviewStatus" aria-live="polite">Your review will be checked against your order before it is recorded.</div>
+      <button class="btn primary" type="submit">Submit verified review</button>
     </form>
   </section>
+  <script src="review.js?v=1"></script>
 </main>
 
 <footer class="site-footer">
