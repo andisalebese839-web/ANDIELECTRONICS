@@ -205,6 +205,8 @@ async function submitOrder(event){
   updateCheckout();
   $("#orderNumberField").value=orderNumber;
   $("#orderSubjectField").value="New Andi Electronics Order — "+orderNumber;
+  const trackingUrl=window.location.origin+window.location.pathname+"?track="+encodeURIComponent(orderNumber)+"#track";
+  if($("#trackingLinkField")) $("#trackingLinkField").value=trackingUrl;
   const form=$("#checkoutForm"),button=$("#submitOrderBtn");
   button.disabled=true;button.textContent="Sending order...";
   showCheckoutStatus("Creating your order...","loading");
@@ -263,6 +265,7 @@ async function submitOrder(event){
       <p>Save this number. We will use it to identify your order.</p>
       <div class="confirmation-actions">
         <button type="button" class="small-btn" onclick="copyOrderNumber('${orderNumber}')">Copy order number</button>
+        <a class="small-btn primary" href="${trackingUrl}">Track my order</a>
         <a class="small-btn whatsapp-order" target="_blank" rel="noopener" href="https://wa.me/27793234998?text=${encodeURIComponent("Hello Andi Electronics. My order number is "+orderNumber+". My phone number is "+customerPhone+". Please confirm my order.")}">Message us on WhatsApp</a>
       </div>`;
     showCheckoutStatus("Order created successfully. Your order number is "+orderNumber+".","success");
@@ -298,6 +301,8 @@ $("#deliveryCity").onchange=()=>{updateDeliverySuburbs();updateCheckout()};
 $("#deliverySuburb").onchange=updateCheckout;
 $("#checkoutForm").addEventListener("submit",submitOrder);
 $("#year").textContent=new Date().getFullYear();
+const initialTrack=new URLSearchParams(window.location.search).get("track");
+if(initialTrack){setTimeout(()=>{openTrack();$("#trackNumber").value=initialTrack;trackOrder(initialTrack)},250);}
 updateFulfilmentFields();
 updateDeliveryLocations();
 if(customerProfile){syncCustomerToCheckout()}
