@@ -71,9 +71,7 @@ $$;
 revoke all on function public.create_order(jsonb) from public;
 grant execute on function public.create_order(jsonb) to anon, authenticated;
 
-
--- Status workflow fix
--- Allows the admin to move an order through the full customer-facing workflow.
+-- Allow the admin dashboard to use the complete status workflow.
 alter table public.orders
   drop constraint if exists orders_status_check;
 
@@ -91,9 +89,7 @@ alter table public.orders
     )
   );
 
-
--- Admin security for the order dashboard.
--- Only the authenticated owner account may read/update orders.
+-- Identify the site owner as the admin.
 create or replace function public.is_admin()
 returns boolean
 language sql
@@ -104,6 +100,7 @@ as $$
   select coalesce(auth.jwt()->>'email','') = 'andisalebese839@gmail.com';
 $$;
 
+-- Replace the old broad authenticated-user policies.
 drop policy if exists "Admins can view orders" on public.orders;
 drop policy if exists "Admins can update orders" on public.orders;
 drop policy if exists "Admins can insert orders" on public.orders;
@@ -121,5 +118,5 @@ to authenticated
 using (public.is_admin())
 with check (public.is_admin());
 
--- Public checkout continues to use the security-definer create_order() RPC,
--- so no public INSERT policy is needed.
+-- Public customers create orders only through create_order().
+-- No public INSERT policy is required.
