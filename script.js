@@ -133,6 +133,7 @@ async function registerCustomer(e){
     console.error(error);$("#accountStatus").textContent=error.message||"Could not create your account.";$("#accountStatus").className="account-status error";
   }finally{button.disabled=false;button.textContent=customerAccountMode==="signup"?"Create account & unlock 10%":"Login"}
 }
+const OWNER_EMAIL="andisalebese839@gmail.com";
 async function loginCustomer(e){
   e.preventDefault();
   const email=$("#accountEmail").value.trim(),password=$("#accountPassword").value;
@@ -142,6 +143,19 @@ async function loginCustomer(e){
     const response=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"apikey":SUPABASE_PUBLISHABLE_KEY,"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({email,password})});
     const data=await response.json();
     if(!response.ok||!data.access_token)throw new Error(data.error_description||data.msg||"Login failed. Please check your email and password.");
+
+    // The normal Login button is also the owner login. After Supabase verifies
+    // the credentials, the owner email is routed to the private dashboard.
+    if(email.toLowerCase()===OWNER_EMAIL.toLowerCase()){
+      ownerAccessToken=data.access_token;
+      localStorage.setItem("andiOwnerAccessToken",ownerAccessToken);
+      syncOwnerQuickButton();
+      $("#accountStatus").textContent="Owner login successful. Opening your admin dashboard...";
+      $("#accountStatus").className="account-status success";
+      setTimeout(()=>{closeAccount();showOwnerDashboard()},350);
+      return;
+    }
+
     const meta=data.user?.user_metadata||{};
     const existing=customerProfile&&customerProfile.email?.toLowerCase()===email.toLowerCase()?customerProfile:null;
     customerProfile={name:meta.full_name||existing?.name||"",phone:meta.phone||existing?.phone||"",email,discountUsed:existing?.discountUsed||false,registeredAt:existing?.registeredAt||new Date().toISOString()};
@@ -149,7 +163,7 @@ async function loginCustomer(e){
     $("#accountStatus").textContent="Login successful. Welcome back, "+(customerProfile.name||"customer")+"!";$("#accountStatus").className="account-status success";
     setTimeout(closeAccount,700);
   }catch(error){
-    console.error(error);$("#accountStatus").textContent=error.message||"Could not log in.";$("##accountStatus")?.classList?.add("error");
+    console.error(error);$("#accountStatus").textContent=error.message||"Could not log in.";$("#accountStatus").className="account-status error";
   }finally{button.disabled=false;button.textContent=customerAccountMode==="signup"?"Create account & unlock 10%":"Login"}
 }
 function handleAccountSubmit(e){return customerAccountMode==="signup"?registerCustomer(e):loginCustomer(e)}
