@@ -14,7 +14,7 @@ async function loadSiteReviews(){
     const reviews=await r.json(),count=reviews.length,average=count?reviews.reduce((s,x)=>s+Number(x.rating),0)/count:0;
     avg.textContent=count?average.toFixed(1):"—";document.getElementById("siteReviewStars").textContent=count?siteStars(Math.round(average)):"☆☆☆☆☆";
     countEl.textContent=count?count+" verified website review"+(count===1?"":"s"):"No approved reviews yet";
-    list.innerHTML=count?reviews.map(x=>"<article class='site-review-card'><div class='site-review-head'><div><strong>"+siteEsc(x.customer_name)+"</strong><div class='site-stars'>"+siteStars(x.rating)+"</div></div><small>"+new Date(x.created_at).toLocaleDateString("en-ZA",{year:"numeric",month:"short",day:"numeric"})+"</small></div><p>"+siteEsc(x.review_text)+"</p></article>").join(""):"<div class='site-review-empty'>No approved reviews yet. Be one of our first verified customers to review Andi Electronics.</div>";
+    list.innerHTML=count?reviews.map(x=>"<article class='site-review-card'><div class='site-review-head'><div><strong>"+siteEsc(x.customer_name)+"</strong><div class='site-stars'>"+siteStars(x.rating)+"</div></div><small>"+new Date(x.created_at).toLocaleDateString("en-ZA",{year:"numeric",month:"short",day:"numeric"})+"</small></div><p>"+siteEsc(x.review_text)+"</p></article>").join(""):"<div class='site-review-empty'>No approved reviews yet. Be one of our first verified customers to review AE Technologies.</div>";
   }catch(e){countEl.textContent="Reviews temporarily unavailable";list.innerHTML="<div class='site-review-empty'>We could not load reviews right now. Please try again later.</div>"}
 }
 document.addEventListener("DOMContentLoaded",()=>{
@@ -246,7 +246,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       '</div>';
     }
     document.querySelectorAll("footer").forEach(function(footer){
-      footer.querySelectorAll("p").forEach(function(p){p.innerHTML=p.innerHTML.replace(/Andi Electronics/g,"AE Technologies")});
+      footer.querySelectorAll("p").forEach(function(p){p.innerHTML=p.innerHTML.replace(/AE Technologies/g,"AE Technologies")});
     });
     const reviewText=document.getElementById("siteReviewText");
     if(reviewText) reviewText.placeholder="Tell us about your experience with AE Technologies…";
