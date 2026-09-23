@@ -130,7 +130,7 @@ async function registerCustomer(e){
       setAccountMode("login");$("#accountEmail").value=email;
     }
   }catch(error){
-    console.error(error);$("#accountStatus").textContent=error.message||"Could not create your account.";$("##accountStatus")?.classList?.add("error");
+    console.error(error);$("#accountStatus").textContent=error.message||"Could not create your account.";$("#accountStatus").className="account-status error";
   }finally{button.disabled=false;button.textContent=customerAccountMode==="signup"?"Create account & unlock 10%":"Login"}
 }
 async function loginCustomer(e){
