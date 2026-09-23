@@ -191,9 +191,13 @@ function updateCheckout(){
   $("#installationTotalField").value=money(install);
   $("#orderTotalField").value=money(grand);
 }
-function statusSteps(status){
-  const steps=["Order received","Order accepted","Preparing order","Shipped","Out for delivery","Order delivered"];
-  const normalized=status==="Delivered"?"Order delivered":status;
+function statusSteps(status,fulfilment){
+  const delivery=fulfilment==="Delivery";
+  const steps=delivery
+    ?["Order placed","Payment verification","Payment verified","Preparing order","Dispatched","Out for delivery","Completed"]
+    :["Order placed","Payment verification","Payment verified","Preparing order","Ready for collection","Completed"];
+  const aliases={"Order received":"Order placed","Order accepted":"Payment verification","Shipped":"Dispatched","Order delivered":"Completed","Delivered":"Completed"};
+  const normalized=aliases[status]||status;
   const index=Math.max(0,steps.indexOf(normalized));
   return steps.map((x,i)=>`<div class="track-step ${i<index?"done":""} ${i===index?"current":""}"><span>${i<index?"✓":i+1}</span><strong>${x}</strong></div>`).join("")
 }
@@ -215,7 +219,7 @@ async function trackOrder(number){
       result.innerHTML=`<div class="track-number">${clean}</div><div class="track-status"><strong>Order not found</strong><span>Please check the order number and try again.</span></div>`;
       return;
     }
-    result.innerHTML=`<div class="track-number">${order.order_number}</div><div class="track-status"><strong>Current status: ${order.status}</strong><span>Last updated: ${new Date(order.updated_at).toLocaleString()}</span></div><div class="track-timeline">${statusSteps(order.status)}</div>`;
+    result.innerHTML=`<div class="track-number">${order.order_number}</div><div class="track-status"><strong>Current status: ${({"Order received":"Order placed","Order accepted":"Payment verification","Shipped":"Dispatched","Order delivered":"Completed","Delivered":"Completed"}[order.status]||order.status)}</strong><span>Last updated: ${new Date(order.updated_at).toLocaleString()}</span></div><div class="track-timeline">${statusSteps(order.status,order.fulfilment)}</div>`;
   }catch(error){
     console.error(error);
     result.innerHTML="<div class='track-status'><strong>Tracking is temporarily unavailable.</strong><span>Please try again in a moment or contact us on WhatsApp.</span></div>";
@@ -364,7 +368,7 @@ async function loadOwnerOrders(){
    const items=Array.isArray(order.products)?order.products:[],itemText=items.map(item=>item.name+" × "+item.qty).join(" • ")||"Order details unavailable",status=order.status||"Order received";
    return `<article class="owner-order"><div class="owner-order-head"><div><strong>${escapeHtml(order.order_number||"Order")}</strong><small>${new Date(order.created_at||Date.now()).toLocaleString()}</small></div><strong>${money(order.order_total||0)}</strong></div>
    <div class="owner-grid"><div><small>Customer</small><strong>${escapeHtml(order.customer_name||"—")}</strong></div><div><small>Phone</small><strong>${escapeHtml(order.customer_phone||"—")}</strong></div><div><small>Fulfilment</small><strong>${escapeHtml(order.fulfilment||"—")}</strong></div><div><small>Email</small><strong>${escapeHtml(order.customer_email||"—")}</strong></div><div><small>Items</small><strong>${escapeHtml(itemText)}</strong></div><div><small>Area</small><strong>${escapeHtml(order.delivery_area||"Collection")}</strong></div></div>
-   <div class="owner-status"><label><strong>Order status</strong></label><select data-order-number="${escapeHtml(order.order_number||"")}" class="owner-status-select">${["Order received","Order accepted","Preparing order","Shipped","Out for delivery","Order delivered"].map(x=>`<option ${x===status?"selected":""}>${x}</option>`).join("")}</select><button type="button" class="small-btn owner-save-status" data-order-number="${escapeHtml(order.order_number||"")}">Update status</button></div></article>`;
+   <div class="owner-status"><label><strong>Order status</strong></label><select data-order-number="${escapeHtml(order.order_number||"")}" class="owner-status-select">${["Order received","Payment verification","Payment verified","Preparing order","Ready for collection","Dispatched","Out for delivery","Order delivered"].map(x=>`<option ${x===status?"selected":""}>${x}</option>`).join("")}</select><button type="button" class="small-btn owner-save-status" data-order-number="${escapeHtml(order.order_number||"")}">Update status</button></div></article>`;
   }).join("");
   document.querySelectorAll(".owner-save-status").forEach(button=>button.onclick=()=>updateOwnerOrderStatus(button.dataset.orderNumber));
  }catch(error){console.error(error);$("#ownerOrders").innerHTML=`<div class="owner-message error">${escapeHtml(error.message||"Could not load orders.")}</div>`}
