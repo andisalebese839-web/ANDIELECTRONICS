@@ -523,6 +523,7 @@ async function updateOwnerOrderStatus(orderNumber){
   if(response.status===401){ownerLogout();throw new Error("Your owner session has expired. Please sign in again.")}
   if(!response.ok){const message=await response.text();throw new Error(message||"Could not update order status.")}
   $("#ownerMessage").textContent=orderNumber+" updated to "+status+".";$("#ownerMessage").className="owner-message success";
+  await loadOwnerOrders();
  }catch(error){console.error(error);$("#ownerMessage").textContent=error.message||"Could not update order status.";$("#ownerMessage").className="owner-message error"}
 }
 function showOwnerDashboard(){$("#ownerLogin").hidden=true;$("#ownerDashboard").hidden=false;loadOwnerOrders()}
