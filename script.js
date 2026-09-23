@@ -238,6 +238,15 @@ async function submitOrder(event){
   const trackingUrl=window.location.origin+window.location.pathname+"?track="+encodeURIComponent(orderNumber)+"#track";
   if($("#trackingLinkField")) $("#trackingLinkField").value=trackingUrl;
   const form=$("#checkoutForm"),button=$("#submitOrderBtn");
+  const proofFile=$("#proofOfPayment")?.files?.[0];
+  if(!proofFile){
+    showCheckoutStatus("Please upload your proof of payment before submitting the order.","error");
+    return;
+  }
+  if(proofFile.size>25*1024*1024){
+    showCheckoutStatus("Your proof of payment must be 25 MB or smaller.","error");
+    return;
+  }
   button.disabled=true;button.textContent="Sending order...";
   showCheckoutStatus("Creating your order...","loading");
   const product=productTotal(),install=selectedInstallationTotal(),delivery=selectedDeliveryFee(),subtotal=product+install+delivery,discount=welcomeDiscount(product,install,delivery),grand=subtotal-discount;
@@ -255,7 +264,9 @@ async function submitOrder(event){
     delivery_fee:delivery,
     discount_total:discount,
     order_total:grand,
-    additional_instructions:form.elements.customer_notes?.value||""
+    additional_instructions:form.elements.customer_notes?.value||"",
+    payment_method:"EFT / Bank deposit",
+    proof_of_payment_filename:proofFile.name
   };
   try{
     const controller=new AbortController();
