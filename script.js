@@ -519,7 +519,7 @@ async function loadOwnerOrders(){
 async function updateOwnerOrderStatus(orderNumber){
  const select=document.querySelector(".owner-status-select[data-order-number='"+CSS.escape(orderNumber)+"']");if(!select)return;
  try{
-  const status=select.value,response=await fetch(SUPABASE_URL+"/rest/v1/orders?order_number=eq."+encodeURIComponent(orderNumber),{method:"PATCH",headers:{...ownerHeaders(),"Prefer":"return=minimal"},body:JSON.stringify({status,updated_at:new Date().toISOString()})});
+  const status=select.value,response=await fetch(SUPABASE_URL+"/rest/v1/orders?order_number=eq."+encodeURIComponent(orderNumber),{method:"PATCH",headers:{...ownerHeaders(),"Prefer":"return=minimal"},body:JSON.stringify({status})});
   if(response.status===401){ownerLogout();throw new Error("Your owner session has expired. Please sign in again.")}
   if(!response.ok){const message=await response.text();throw new Error(message||"Could not update order status.")}
   $("#ownerMessage").textContent=orderNumber+" updated to "+status+".";$("#ownerMessage").className="owner-message success";
