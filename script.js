@@ -290,9 +290,16 @@ async function submitOrder(event){
     $("#checkoutSummary").innerHTML="<div class='order-success'><strong>Order request sent ✓</strong><span>Your order has been saved successfully.</span></div>";
     $("#checkoutGrandTotal").textContent="R0.00";
     $("#orderConfirmation").hidden=false;
+    const fulfilmentMessage=orderData.fulfilment==="Collection"
+      ?"📦 Collection: Your order will be ready for collection within 3–4 weeks."
+      :"🚚 Delivery: Your order will be prepared within 3–4 weeks, after which it will be dispatched for delivery.";
     $("#orderConfirmation").innerHTML=`
       <span>Your unique order number</span><strong>${orderNumber}</strong>
       <p>Save this number. We will use it to identify your order.</p>
+      <div class="order-preparation-note">
+        <strong>${fulfilmentMessage}</strong>
+        <span>Please note: The 3–4 week period is an estimated preparation time. We will notify you when your order is ready for collection or has been prepared for delivery.</span>
+      </div>
       <div class="confirmation-actions">
         <button type="button" class="small-btn" onclick="copyOrderNumber('${orderNumber}')">Copy order number</button>
         <a class="small-btn primary" href="${trackingUrl}">Track my order</a>
