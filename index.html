@@ -315,7 +315,7 @@
       <input type="hidden" name="product_total" id="productTotalField">
       <input type="hidden" name="installation_total" id="installationTotalField">
       <input type="hidden" name="order_total" id="orderTotalField"><input type="hidden" name="discount_total" id="discountTotalField"><input type="hidden" name="tracking_link" id="trackingLinkField">
-      <label>Registered name<input required name="customer_name" id="checkoutCustomerName" autocomplete="name" placeholder="Register first"></label><input type="hidden" name="email" id="checkoutEmail" value=""><label>Registered cellphone<input required type="tel" name="customer_phone" id="checkoutCustomerPhone" autocomplete="tel" placeholder="Register first"></label><div id="accountCheckoutNote" class="account-checkout-note">Register first to unlock your 10% first-order discount.</div>
+      <label>Customer name<input required name="customer_name" id="checkoutCustomerName" autocomplete="name" placeholder="Enter your full name"></label><label>Email address<input required type="email" name="email" id="checkoutEmail" autocomplete="email" placeholder="Enter your email address"><span class="field-help">We will use this email address for your order details and future order communication.</span></label><label>Customer cellphone<input required type="tel" name="customer_phone" id="checkoutCustomerPhone" autocomplete="tel" placeholder="Register first"></label><div id="accountCheckoutNote" class="account-checkout-note">Register first to unlock your 10% first-order discount.</div>
       <label>Fulfilment option<select required name="fulfilment_option" id="fulfilmentOption">
         <option value="collection">Collection — R0</option>
         <option value="delivery">Delivery</option>
@@ -326,7 +326,7 @@
           <option>Eastern Cape</option><option>Free State</option><option>Gauteng</option><option>KwaZulu-Natal</option><option>Limpopo</option><option>Mpumalanga</option><option>North West</option><option>Northern Cape</option><option>Western Cape</option>
         </select></label>
         <label>City / Town<select required name="delivery_city" id="deliveryCity" disabled><option value="">Select province first</option></select></label>
-        <label>Suburb<select required name="delivery_suburb" id="deliverySuburb" disabled><option value="">Select city first</option></select></label>
+        <label>Suburb<input required name="delivery_suburb" id="deliverySuburb" autocomplete="address-level3" placeholder="Enter your suburb"></label>
         <input type="hidden" name="delivery_area" id="deliveryArea" value="">
       </div>
       <label>Delivery address / house number<input required name="customer_address" id="customerAddress" autocomplete="street-address" placeholder="Street, house/unit number"></label>
