@@ -190,6 +190,11 @@ function updateCheckout(){
   $("#productTotalField").value=money(product);
   $("#installationTotalField").value=money(install);
   $("#orderTotalField").value=money(grand);
+  const email=$("#checkoutEmail")?.value.trim()||"";
+  const proofWa=$("#checkoutProofWhatsApp"),proofEmail=$("#checkoutProofEmail");
+  const proofText="Hello AE Technologies. I have made the EFT/bank payment. My order number is "+($("#orderNumberField")?.value||"PENDING")+". I am sending my proof of payment now.";
+  if(proofWa)proofWa.href="https://wa.me/27793234998?text="+encodeURIComponent(proofText);
+  if(proofEmail)proofEmail.href="mailto:andisalebese839@gmail.com?subject="+encodeURIComponent("Proof of payment — "+($("#orderNumberField")?.value||"Order"))+"&body="+encodeURIComponent("Hello AE Technologies.\n\nOrder number: "+($("#orderNumberField")?.value||"PENDING")+"\nCustomer email: "+email+"\n\nI have made the EFT/bank payment and attached my proof of payment.");
 }
 function statusSteps(status,fulfilment){
   const delivery=fulfilment==="Delivery";
@@ -242,15 +247,6 @@ async function submitOrder(event){
   const trackingUrl=window.location.origin+window.location.pathname+"?track="+encodeURIComponent(orderNumber)+"#track";
   if($("#trackingLinkField")) $("#trackingLinkField").value=trackingUrl;
   const form=$("#checkoutForm"),button=$("#submitOrderBtn");
-  const proofFile=$("#proofOfPayment")?.files?.[0];
-  if(!proofFile){
-    showCheckoutStatus("Please upload your proof of payment before submitting the order.","error");
-    return;
-  }
-  if(proofFile.size>25*1024*1024){
-    showCheckoutStatus("Your proof of payment must be 25 MB or smaller.","error");
-    return;
-  }
   button.disabled=true;button.textContent="Sending order...";
   showCheckoutStatus("Creating your order...","loading");
   const product=productTotal(),install=selectedInstallationTotal(),delivery=selectedDeliveryFee(),subtotal=product+install+delivery,discount=welcomeDiscount(product,install,delivery),grand=subtotal-discount;
@@ -270,7 +266,7 @@ async function submitOrder(event){
     order_total:grand,
     additional_instructions:form.elements.customer_notes?.value||"",
     payment_method:"EFT / Bank deposit",
-    proof_of_payment_filename:proofFile.name
+    proof_of_payment_filename:"To be sent via WhatsApp or email"
   };
   try{
     const controller=new AbortController();
@@ -300,6 +296,9 @@ async function submitOrder(event){
     }
 
     const customerPhone=form.elements.customer_phone.value;
+    const customerEmail=form.elements.email.value.trim();
+    const proofWhatsAppUrl="https://wa.me/27793234998?text="+encodeURIComponent("Hello AE Technologies. My order number is "+orderNumber+". I have made the EFT/bank payment. I am sending my proof of payment now.");
+    const proofEmailUrl="mailto:andisalebese839@gmail.com?subject="+encodeURIComponent("Proof of payment — "+orderNumber)+"&body="+encodeURIComponent("Hello AE Technologies.\n\nOrder number: "+orderNumber+"\nCustomer: "+form.elements.customer_name.value.trim()+"\nEmail: "+customerEmail+"\nPhone: "+customerPhone+"\n\nI have made the EFT/bank payment and attached my proof of payment.");
     if(customerProfile){customerProfile.discountUsed=true;saveCustomerProfile()}
     form.reset();cart=[];saveCart();
     $("#checkoutSummary").innerHTML="<div class='order-success'><strong>Order request sent ✓</strong><span>Your order has been saved successfully.</span></div>";
@@ -318,7 +317,9 @@ async function submitOrder(event){
       <div class="confirmation-actions">
         <button type="button" class="small-btn" onclick="copyOrderNumber('${orderNumber}')">Copy order number</button>
         <a class="small-btn primary" href="${trackingUrl}">Track my order</a>
-        <a class="small-btn whatsapp-order" target="_blank" rel="noopener" href="https://wa.me/27793234998?text=${encodeURIComponent("Hello AE Technologies. My order number is "+orderNumber+". My phone number is "+customerPhone+". Please confirm my order.")}">Message us on WhatsApp</a>
+        <a class="small-btn" href="mailto:${encodeURIComponent(customerEmail)}?subject=${encodeURIComponent("Your AE Technologies order tracking link — "+orderNumber)}&body=${encodeURIComponent("Hello "+form.elements.customer_name.value.trim()+",\n\nHere is your AE Technologies tracking link:\n"+trackingUrl+"\n\nYour order number is "+orderNumber+".\n\nRegards,\nAE Technologies")}">Email my tracking link</a>
+        <a class="small-btn whatsapp-order" target="_blank" rel="noopener" href="${proofWhatsAppUrl}">Send proof on WhatsApp</a>
+        <a class="small-btn" href="${proofEmailUrl}">Send proof by email</a>
       </div>`;
     showCheckoutStatus("Order created successfully. Your order number is "+orderNumber+".","success");
   }catch(error){
