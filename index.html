@@ -73,6 +73,22 @@
 .product-benefits{display:grid;gap:10px;padding-left:0;list-style:none;color:#334155}
 .product-detail-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
 @media(max-width:720px){.product-details-card{padding:18px}.product-detail-top{grid-template-columns:1fr}.product-detail-actions .btn{width:100%;box-sizing:border-box;text-align:center}}
+</style><style>
+.faq-section{background:#f7fbff}
+.faq-wrap{max-width:900px;margin:0 auto}
+.faq-list{display:grid;gap:12px;margin-top:28px}
+.faq-item{background:#fff;border:1px solid #dcecff;border-radius:16px;overflow:hidden;box-shadow:0 8px 24px rgba(18,104,232,.05)}
+.faq-question{width:100%;border:0;background:#fff;padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:18px;text-align:left;font:inherit;font-weight:800;color:#18324f;cursor:pointer}
+.faq-question:hover{background:#f8fbff}
+.faq-icon{font-size:1.4rem;color:#1268e8;transition:transform .2s ease;flex:none}
+.faq-item.open .faq-icon{transform:rotate(45deg)}
+.faq-answer{display:grid;grid-template-rows:0fr;transition:grid-template-rows .25s ease}
+.faq-answer-inner{overflow:hidden;color:#526b88;line-height:1.7;padding:0 22px}
+.faq-item.open .faq-answer{grid-template-rows:1fr}
+.faq-item.open .faq-answer-inner{padding-bottom:20px}
+.faq-cta{margin-top:24px;padding:20px 22px;border:1px solid #cfe5ff;border-radius:18px;background:#fff;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.faq-cta span{color:#526b88;flex:1 1 300px}
+@media(max-width:720px){.faq-question{padding:17px}.faq-answer-inner{padding-left:17px;padding-right:17px}.faq-item.open .faq-answer-inner{padding-bottom:17px}.faq-cta{align-items:flex-start;flex-direction:column}}
 </style></head>
 <body>
 <header class="site-header">
@@ -80,7 +96,7 @@
     <a class="brand" href="#home"><img class="brand-logo" src="logo.svg" alt="AE Andi Electronics logo"><span class="brand-name">ANDI<span>ELECTRONICS</span></span></a>
     <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
     <nav id="navLinks">
-      <a href="#home">Home</a><a href="#shop">Shop</a><a href="#services">Services</a><a href="#about">About</a><a href="#contact">Contact</a>
+      <a href="#home">Home</a><a href="#shop">Shop</a><a href="#services">Services</a><a href="#about">About</a><a href="#faq">FAQs</a><a href="#contact">Contact</a>
       <button class="account-btn" id="accountBtn">Register / Account</button><button class="cart-btn" id="cartBtn">Cart <span id="cartCount">0</span></button><button class="track-btn" id="trackBtn">Track order</button>
     </nav>
   </div>
@@ -157,6 +173,65 @@
   <div class="container about-grid">
     <div><p class="eyebrow">ABOUT ANDI ELECTRONICS</p><h2>Technology made practical.</h2><p>Andi Electronics is focused on accessible electronics, automation and useful products. The goal is simple: understand the problem first, then build technology that makes the solution easier.</p></div>
     <div class="stats"><div><strong>01</strong><span>Understand</span></div><div><strong>02</strong><span>Design</span></div><div><strong>03</strong><span>Build</span></div><div><strong>04</strong><span>Improve</span></div></div>
+  </div>
+</section>
+
+<section id="faq" class="section faq-section">
+  <div class="container faq-wrap">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">FREQUENTLY ASKED QUESTIONS</p>
+        <h2>Questions? We've got you.</h2>
+        <p class="service-intro">Here are some of the questions customers often ask about our products, installations and custom electronics projects.</p>
+      </div>
+    </div>
+    <div class="faq-list">
+      <article class="faq-item">
+        <button class="faq-question" type="button" aria-expanded="false">What does Andi Electronics do?<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Andi Electronics designs practical electronics, monitoring devices, automation solutions and custom projects for homes and small businesses. We focus on solving a real problem first, then choosing the technology that fits it.</div></div>
+      </article>
+      <article class="faq-item">
+        <button class="faq-question" type="button" aria-expanded="false">Do you offer installation?<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Yes. Selected products have an installation option with a separate installation price shown on the product card. If your project is custom, we can discuss the installation requirements before giving you a quotation.</div></div>
+      </article>
+      <article class="faq-item">
+        <button class="faq-question" type="button" aria-expanded="false">Do I need Wi-Fi for your devices?<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">It depends on the product. Some monitoring devices can work without Wi-Fi, while connected solutions may use Wi-Fi or another communication method. We will explain the requirements for the specific solution you choose.</div></div>
+      </article>
+      <article class="faq-item">
+        <button class="faq-question" type="button" aria-expanded="false">Can you build a device specifically for my business?<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Yes. Our Custom Innovation service is for ideas that do not fit a standard product. Tell us what problem you are experiencing, what you want the device to do and where it will be used. You do not need to know the technical terms.</div></div>
+      </article>
+      <article class="faq-item">
+        <button class="faq-question" type="button" aria-expanded="false">How do I order a product?<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Choose a product, read the details, then add it to your cart or make an inquiry. At checkout, provide your customer and delivery details and follow the available payment instructions.</div></div>
+      </article>
+      <article class="faq-item">
+        <button class="faq-question" type="button" aria-expanded="false">Can I ask for a quotation before ordering?<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Absolutely. Use the Make an Inquiry option on a product or contact us with your requirements. This is especially useful for multiple units, custom features, installations or business projects.</div></div>
+      </article>
+      <article class="faq-item">
+        <button class="faq-question" type="button" aria-expanded="false">How long does a custom project take?<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">The timeline depends on the complexity of the project, the components required and whether a prototype is needed. After reviewing your idea, we can discuss the expected development and installation timeline.</div></div>
+      </article>
+      <article class="faq-item">
+        <button class="faq-question" type="button" aria-expanded="false">How can I track my order?<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">After placing an order, you receive a unique order number. You can use the Track order option on the website to check the status of your order.</div></div>
+      </article>
+      <article class="faq-item">
+        <button class="faq-question" type="button" aria-expanded="false">What if I have an idea but I don't know how to build it?<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">That is exactly what our Custom Innovation service is for. Describe the problem or the result you want in normal language. We can help turn the idea into a clearer project concept and identify the electronics needed.</div></div>
+      </article>
+      <article class="faq-item">
+        <button class="faq-question" type="button" aria-expanded="false">How do I contact Andi Electronics?<span class="faq-icon">+</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">You can contact us by email, WhatsApp or phone using the details in the Contact section. You can also submit a project enquiry directly through the website.</div></div>
+      </article>
+    </div>
+    <div class="faq-cta">
+      <strong>Still have a question?</strong>
+      <span>Tell us what you need and we'll help you figure out the next step.</span>
+      <a class="btn primary" href="#contact">Contact us</a>
+    </div>
   </div>
 </section>
 
@@ -553,6 +628,24 @@ document.addEventListener("DOMContentLoaded",function(){
   });
 })();
 </script>
-<script src="website-reviews.js?v=1"></script>
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+  document.querySelectorAll(".faq-question").forEach(function(button){
+    button.addEventListener("click",function(){
+      var item=button.closest(".faq-item");
+      var isOpen=item.classList.contains("open");
+      document.querySelectorAll(".faq-item.open").forEach(function(other){
+        other.classList.remove("open");
+        var otherButton=other.querySelector(".faq-question");
+        if(otherButton)otherButton.setAttribute("aria-expanded","false");
+      });
+      if(!isOpen){
+        item.classList.add("open");
+        button.setAttribute("aria-expanded","true");
+      }
+    });
+  });
+});
+</script>\n<script src="website-reviews.js?v=1"></script>
 </body>
 </html>
