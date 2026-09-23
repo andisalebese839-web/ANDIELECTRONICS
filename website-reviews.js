@@ -318,3 +318,32 @@ document.addEventListener("DOMContentLoaded",()=>{
   style.textContent=css;
   document.head.appendChild(style);
 })();
+
+(function(){
+  document.addEventListener("DOMContentLoaded",function(){
+    const shopLink=document.querySelector('nav a[href="#shop"]');
+    if(shopLink) shopLink.textContent="Gadgets";
+    const servicesLink=document.querySelector('nav a[href="#services"]');
+    if(servicesLink) servicesLink.textContent="Services";
+    const schema=document.querySelector('script[type="application/ld+json"]');
+    if(schema){
+      schema.textContent=JSON.stringify({
+        "@context":"https://schema.org",
+        "@type":"Store",
+        "name":"AE Technologies",
+        "url":"https://andisalebese839-web.github.io/ANDIELECTRONICS/",
+        "email":"andisalebese839@gmail.com",
+        "telephone":"+27793234998",
+        "description":"AE Technologies designs practical electronics, automation and monitoring solutions for homes, workshops, factories and small businesses in South Africa.",
+        "areaServed":"ZA",
+        "hasOfferCatalog":{
+          "@type":"OfferCatalog",
+          "name":"AE Technologies Gadgets",
+          "itemListElement":AE_PRODUCTS.map(function(p){
+            return {"@type":"Offer","itemOffered":{"@type":"Product","name":p.name,"description":p.desc},"price":String(p.price),"priceCurrency":"ZAR","availability":"https://schema.org/InStock","url":"https://andisalebese839-web.github.io/ANDIELECTRONICS/#shop"};
+          })
+        }
+      },null,2);
+    }
+  });
+})();
