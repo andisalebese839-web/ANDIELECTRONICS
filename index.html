@@ -98,7 +98,7 @@
 .payment-warning{font-size:.9rem;margin-bottom:0}.field-help{display:block;color:#64748b;font-size:.85rem;font-weight:400}
 .checkout-form input[type=file]{padding:10px;background:#fff}
 @media(max-width:720px){.bank-details{grid-template-columns:1fr}}
-</style><style>.whatsapp-contact-label{display:inline-flex;align-items:center;gap:8px}.whatsapp-logo{width:21px;height:21px;display:inline-block;flex:none}</style></head>
+</style><style>.whatsapp-contact-label{display:inline-flex;align-items:center;gap:8px}.whatsapp-logo{width:21px;height:21px;display:inline-block;flex:none}</style><style>.payment-proof-options{margin-top:14px;padding:14px;border:1px solid #e1efff;border-radius:12px;background:#fff;display:grid;gap:8px}.payment-proof-options>span{color:#64748b;font-size:.9rem;line-height:1.5}.payment-proof-buttons{display:flex;gap:8px;flex-wrap:wrap}@media(max-width:720px){.payment-proof-buttons .small-btn{width:100%;box-sizing:border-box;text-align:center}}</style></head>
 <body>
 <header class="site-header">
   <div class="container nav">
@@ -315,7 +315,7 @@
       <input type="hidden" name="product_total" id="productTotalField">
       <input type="hidden" name="installation_total" id="installationTotalField">
       <input type="hidden" name="order_total" id="orderTotalField"><input type="hidden" name="discount_total" id="discountTotalField"><input type="hidden" name="tracking_link" id="trackingLinkField">
-      <label>Registered name<input required name="customer_name" id="checkoutCustomerName" autocomplete="name" placeholder="Register first"></label><input type="hidden" name="email" id="checkoutEmail" value="no-email@andi.local"><label>Registered cellphone<input required type="tel" name="customer_phone" id="checkoutCustomerPhone" autocomplete="tel" placeholder="Register first"></label><div id="accountCheckoutNote" class="account-checkout-note">Register first to unlock your 10% first-order discount.</div>
+      <label>Registered name<input required name="customer_name" id="checkoutCustomerName" autocomplete="name" placeholder="Register first"></label><input type="hidden" name="email" id="checkoutEmail" value=""><label>Registered cellphone<input required type="tel" name="customer_phone" id="checkoutCustomerPhone" autocomplete="tel" placeholder="Register first"></label><div id="accountCheckoutNote" class="account-checkout-note">Register first to unlock your 10% first-order discount.</div>
       <label>Fulfilment option<select required name="fulfilment_option" id="fulfilmentOption">
         <option value="collection">Collection — R0</option>
         <option value="delivery">Delivery</option>
@@ -337,7 +337,7 @@
       <div class="payment-instructions">
         <p class="eyebrow">PAYMENT BY EFT / BANK DEPOSIT</p>
         <h3>Pay directly to AE Technologies</h3>
-        <p>Please make payment using your order number as the reference, then upload your proof of payment below.</p>
+        <p>After you make payment, send your proof of payment using WhatsApp or email. Your order will move to payment verification when we receive it.</p>
         <div class="bank-details">
           <div><span>Account holder</span><strong>AE Technologies</strong></div>
           <div><span>Bank</span><strong>Standard Bank</strong></div>
@@ -348,10 +348,10 @@
         </div>
         <p class="payment-warning">Please check the banking details carefully before making payment. Your order will be processed after payment has been verified.</p>
       </div>
-      <label>Proof of payment <span class="field-help">Upload a clear image or PDF of your payment confirmation.</span><input required type="file" name="proof_of_payment" id="proofOfPayment" accept="image/png,image/jpeg,image/webp,application/pdf"></label>
+      <div class="payment-proof-options"><strong>How to send proof of payment</strong><span>After checkout, your order number will be shown. Send your payment confirmation with that order number.</span><div class="payment-proof-buttons"><a class="small-btn whatsapp-order" id="checkoutProofWhatsApp" target="_blank" rel="noopener" href="#">Send proof on WhatsApp</a><a class="small-btn" id="checkoutProofEmail" href="#">Send proof by email</a></div></div>
       <label>Additional instructions (optional)<textarea name="customer_notes" rows="4" placeholder="Anything we should know about your order?"></textarea></label>
       <div id="checkoutDiscountLine" class="checkout-discount-line" hidden><span>First-order discount (10%)</span><strong id="checkoutDiscount">-R0.00</strong></div><div class="checkout-total"><span>Estimated total</span><strong id="checkoutGrandTotal">R0.00</strong></div>
-      <p class="checkout-note">Your unique order number will be created when you submit this request. Use it as your EFT/bank-deposit reference. Upload your proof of payment so we can verify your payment and begin processing your order.</p>
+      <p class="checkout-note">Your unique order number will be created when you submit this request. Use it as your EFT/bank-deposit reference, then send your proof of payment to AE Technologies by WhatsApp or email.</p>
       <button class="btn primary" id="submitOrderBtn" type="submit">Send order request</button>
       <div id="checkoutStatus" class="checkout-status" role="status" aria-live="polite"></div>
       <div id="orderConfirmation" class="order-confirmation" hidden></div>
@@ -359,7 +359,7 @@
   </div>
 </div>
 <div class="overlay" id="overlay"></div>
-<div class="account-modal" id="accountModal" aria-hidden="true"><div class="account-card"><div class="cart-head"><div><p class="eyebrow">WELCOME TO AE TECHNOLOGIES</p><h2 id="accountTitle">Create your account</h2></div><button type="button" id="closeAccount" aria-label="Close account">×</button></div><div class="account-visual"><div class="mini-robot">◉</div><div><strong>10% OFF YOUR FIRST ORDER</strong><span>Register with only your name and cellphone number.</span></div></div><form id="accountForm" class="account-form"><label>Full name<input id="accountName" required autocomplete="name" placeholder="Your full name"></label><label>Cellphone number<input id="accountPhone" required type="tel" autocomplete="tel" placeholder="079 123 4567"></label><button class="btn primary" type="submit">Create account & unlock 10%</button><div id="accountStatus" class="account-status" role="status" aria-live="polite"></div></form><div id="accountWelcome" hidden></div></div></div>
+<div class="account-modal" id="accountModal" aria-hidden="true"><div class="account-card"><div class="cart-head"><div><p class="eyebrow">WELCOME TO AE TECHNOLOGIES</p><h2 id="accountTitle">Create your account</h2></div><button type="button" id="closeAccount" aria-label="Close account">×</button></div><div class="account-visual"><div class="mini-robot">◉</div><div><strong>10% OFF YOUR FIRST ORDER</strong><span>Register with your name, email and cellphone number.</span></div></div><form id="accountForm" class="account-form"><label>Full name<input id="accountName" required autocomplete="name" placeholder="Your full name"></label><label>Cellphone number<input id="accountPhone" required type="tel" autocomplete="tel" placeholder="079 123 4567"></label><button class="btn primary" type="submit">Create account & unlock 10%</button><div id="accountStatus" class="account-status" role="status" aria-live="polite"></div></form><div id="accountWelcome" hidden></div></div></div>
 
 
 <!-- Private owner area: hidden until the owner uses Alt + Shift + A -->
@@ -457,7 +457,7 @@ function showAccountState(){
   var title=qs("accountTitle"),form=qs("accountForm");
   if(!customerProfile){
     title.textContent="Login";
-    form.innerHTML='<div class="account-tabs"><button type="button" class="account-tab active" id="loginTab">Login</button><button type="button" class="account-tab" id="registerTab">Register</button></div><div id="loginPanel"><p class="account-help">Log in with your name and password.</p><label>Full name<input id="loginName" required autocomplete="username" placeholder="Your full name"></label><label>Password<input id="loginPassword" required type="password" autocomplete="current-password" placeholder="Your password"></label><button class="btn primary" type="submit">Login</button><div id="accountStatus" class="account-status" role="status" aria-live="polite"></div></div><div id="registerPanel" hidden><p class="account-help">New here? Register with your name, cellphone number and a password.</p><label>Full name<input id="registerName" required autocomplete="name" placeholder="Your full name"></label><label>Cellphone number<input id="registerPhone" required type="tel" autocomplete="tel" placeholder="079 123 4567"></label><label>Password<input id="registerPassword" required type="password" minlength="6" autocomplete="new-password" placeholder="Create a password (6+ characters)"></label><button class="btn primary" type="button" id="registerSubmit">Register & unlock 10%</button><div id="registerStatus" class="account-status" role="status" aria-live="polite"></div></div>';
+    form.innerHTML='<div class="account-tabs"><button type="button" class="account-tab active" id="loginTab">Login</button><button type="button" class="account-tab" id="registerTab">Register</button></div><div id="loginPanel"><p class="account-help">Log in with your name and password.</p><label>Full name<input id="loginName" required autocomplete="username" placeholder="Your full name"></label><label>Password<input id="loginPassword" required type="password" autocomplete="current-password" placeholder="Your password"></label><button class="btn primary" type="submit">Login</button><div id="accountStatus" class="account-status" role="status" aria-live="polite"></div></div><div id="registerPanel" hidden><p class="account-help">New here? Register with your name, email, cellphone number and a password.</p><label>Full name<input id="registerName" required autocomplete="name" placeholder="Your full name"></label><label>Email address<input id="registerEmail" required type="email" autocomplete="email" placeholder="you@example.com"></label><label>Cellphone number<input id="registerPhone" required type="tel" autocomplete="tel" placeholder="079 123 4567"></label><label>Password<input id="registerPassword" required type="password" minlength="6" autocomplete="new-password" placeholder="Create a password (6+ characters)"></label><button class="btn primary" type="button" id="registerSubmit">Register & unlock 10%</button><div id="registerStatus" class="account-status" role="status" aria-live="polite"></div></div>';
     form.onsubmit=function(e){e.preventDefault();};
     qs("loginTab").onclick=function(){qs("loginPanel").hidden=false;qs("registerPanel").hidden=true;qs("loginTab").classList.add("active");qs("registerTab").classList.remove("active")};
     qs("registerTab").onclick=function(){qs("loginPanel").hidden=true;qs("registerPanel").hidden=false;qs("registerTab").classList.add("active");qs("loginTab").classList.remove("active")};
@@ -472,11 +472,12 @@ function showAccountState(){
 function escapeAccount(v){return String(v||"").replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]})}
 async function registerNewCustomer(e){
   if(e&&e.preventDefault)e.preventDefault();
-  var name=qs("registerName").value.trim(),phone=qs("registerPhone").value.trim(),password=qs("registerPassword").value,status=qs("registerStatus");
-  if(!name||!phone){status.textContent="Please enter your name and cellphone number.";status.className="account-status error";return}
+  var name=qs("registerName").value.trim(),email=qs("registerEmail").value.trim(),phone=qs("registerPhone").value.trim(),password=qs("registerPassword").value,status=qs("registerStatus");
+  if(!name||!email||!phone){status.textContent="Please enter your name, email and cellphone number.";status.className="account-status error";return}
+  if(!/^\S+@\S+\.\S+$/.test(email)){status.textContent="Please enter a valid email address.";status.className="account-status error";return}
   if(password.length<6){status.textContent="Please choose a password with at least 6 characters.";status.className="account-status error";return}
   var hash=await hashPassword(password);
-  customerProfile={name:name,phone:phone,passwordHash:hash,discountUsed:false,registeredAt:new Date().toISOString()};
+  customerProfile={name:name,email:email,phone:phone,passwordHash:hash,discountUsed:false,registeredAt:new Date().toISOString()};
   saveProfile();setAccountButton();
   status.textContent="Congratulations! 🎉 You have 10% OFF your first order.";
   status.className="account-status success";
@@ -506,8 +507,9 @@ function enhancedOpenAccount(){
 function enhancedCloseAccount(){qs("accountModal").classList.remove("open");qs("accountModal").setAttribute("aria-hidden","true")}
 function enhancedSync(){
   if(!customerProfile)return;
-  var n=qs("checkoutCustomerName"),p=qs("checkoutCustomerPhone"),note=qs("accountCheckoutNote");
+  var n=qs("checkoutCustomerName"),e=qs("checkoutEmail"),p=qs("checkoutCustomerPhone"),note=qs("accountCheckoutNote");
   if(n)n.value=customerProfile.name||"";
+  if(e)e.value=customerProfile.email||"";
   if(p)p.value=customerProfile.phone||"";
   if(n)n.readOnly=true;if(p)p.readOnly=true;
   if(note)note.textContent=customerProfile.discountUsed?"Your first-order 10% discount has already been used.":"Welcome back, "+customerProfile.name+" — your 10% first-order discount is active.";
