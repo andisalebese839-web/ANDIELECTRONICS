@@ -486,8 +486,22 @@ async function registerNewCustomer(e){
 async function loginCustomer(e){
   if(e&&e.preventDefault)e.preventDefault();
   var passwordField=qs("loginPassword")||qs("accountPassword"),status=qs("accountStatus"),password=passwordField?passwordField.value:"";
+  if(!customerProfile){
+    status.textContent="No account is saved on this device yet. Please choose Register first.";
+    status.className="account-status error";
+    return;
+  }
+  if(!password){
+    status.textContent="Please enter your password.";
+    status.className="account-status error";
+    return;
+  }
   var hash=await hashPassword(password);
-  if(hash!==customerProfile.passwordHash){status.textContent="Incorrect password. Please try again.";status.className="account-status error";return}
+  if(hash!==customerProfile.passwordHash){
+    status.textContent="Incorrect password. Please try again.";
+    status.className="account-status error";
+    return;
+  }
   status.textContent="";
   showLoggedInAccount();
 }
