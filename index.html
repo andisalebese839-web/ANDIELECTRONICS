@@ -89,6 +89,15 @@
 .faq-cta{margin-top:24px;padding:20px 22px;border:1px solid #cfe5ff;border-radius:18px;background:#fff;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .faq-cta span{color:#526b88;flex:1 1 300px}
 @media(max-width:720px){.faq-question{padding:17px}.faq-answer-inner{padding-left:17px;padding-right:17px}.faq-item.open .faq-answer-inner{padding-bottom:17px}.faq-cta{align-items:flex-start;flex-direction:column}}
+</style><style>
+.payment-instructions{margin-top:8px;padding:18px;border:1px solid #cfe5ff;border-radius:16px;background:#f7fbff}
+.payment-instructions h3{margin:4px 0 8px}.payment-instructions p{color:#526b88;line-height:1.55}
+.bank-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+.bank-details div{padding:10px 12px;background:#fff;border:1px solid #e1efff;border-radius:10px}
+.bank-details span{display:block;color:#64748b;font-size:.82rem;margin-bottom:3px}.bank-details strong{word-break:break-word}
+.payment-warning{font-size:.9rem;margin-bottom:0}.field-help{display:block;color:#64748b;font-size:.85rem;font-weight:400}
+.checkout-form input[type=file]{padding:10px;background:#fff}
+@media(max-width:720px){.bank-details{grid-template-columns:1fr}}
 </style></head>
 <body>
 <header class="site-header">
@@ -299,7 +308,7 @@
   <div class="checkout-card">
     <div class="cart-head"><div><p class="eyebrow">ORDER REQUEST</p><h2>Checkout</h2></div><button type="button" id="closeCheckout" aria-label="Close checkout">×</button></div>
     <div id="checkoutSummary" class="checkout-summary"></div>
-    <form id="checkoutForm" class="checkout-form">
+    <form id="checkoutForm" class="checkout-form" enctype="multipart/form-data">
       <input type="hidden" name="_subject" id="orderSubjectField" value="New Andi Electronics Order Request">
       <input type="hidden" name="order_number" id="orderNumberField">
       <input type="hidden" name="order_items" id="orderItemsField">
@@ -325,9 +334,24 @@
         <option value="products_only">Products only</option>
         <option value="products_installation">Products + installation</option>
       </select></label>
+      <div class="payment-instructions">
+        <p class="eyebrow">PAYMENT BY EFT / BANK DEPOSIT</p>
+        <h3>Pay directly to AE Technologies</h3>
+        <p>Please make payment using your order number as the reference, then upload your proof of payment below.</p>
+        <div class="bank-details">
+          <div><span>Account holder</span><strong>AE Technologies</strong></div>
+          <div><span>Bank</span><strong>Standard Bank</strong></div>
+          <div><span>Account number</span><strong>0000010287902135</strong></div>
+          <div><span>Account type</span><strong>Current</strong></div>
+          <div><span>Branch code</span><strong>051001</strong></div>
+          <div><span>Reference</span><strong>Your order number</strong></div>
+        </div>
+        <p class="payment-warning">Please check the banking details carefully before making payment. Your order will be processed after payment has been verified.</p>
+      </div>
+      <label>Proof of payment <span class="field-help">Upload a clear image or PDF of your payment confirmation.</span><input required type="file" name="proof_of_payment" id="proofOfPayment" accept="image/png,image/jpeg,image/webp,application/pdf"></label>
       <label>Additional instructions (optional)<textarea name="customer_notes" rows="4" placeholder="Anything we should know about your order?"></textarea></label>
       <div id="checkoutDiscountLine" class="checkout-discount-line" hidden><span>First-order discount (10%)</span><strong id="checkoutDiscount">-R0.00</strong></div><div class="checkout-total"><span>Estimated total</span><strong id="checkoutGrandTotal">R0.00</strong></div>
-      <p class="checkout-note">Your unique order number will be created when you submit this request. Keep it for order tracking. Payment is not taken yet.</p>
+      <p class="checkout-note">Your unique order number will be created when you submit this request. Use it as your EFT/bank-deposit reference. Upload your proof of payment so we can verify your payment and begin processing your order.</p>
       <button class="btn primary" id="submitOrderBtn" type="submit">Send order request</button>
       <div id="checkoutStatus" class="checkout-status" role="status" aria-live="polite"></div>
       <div id="orderConfirmation" class="order-confirmation" hidden></div>
