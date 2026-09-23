@@ -1,10 +1,9 @@
 const products=[
-{id:1,name:"Automatic Night Light",category:"Smart Lighting",price:349,install:250,icon:"🌙",image:"https://lumiliving.co.za/cdn/shop/files/IMG01_674149aa-f71f-4dd1-acf3-7edeb9010c66.jpg?v=1770915819&width=1024",desc:"Automatic dusk-to-dawn light for bedrooms, passages and entrances."},
-{id:2,name:"Motion-Sensor Light",category:"Smart Lighting",price:449,install:300,icon:"🚶",image:"https://www.futurelight.co.za/cdn/shop/files/PioLEDLighting-F356S30WOoberIP65LEDSensorFloodlight6000K_3000K.png?v=1761058896&width=1024",desc:"Motion-activated lighting for entrances, garages, passages and outdoor areas."},
-{id:3,name:"Water-Level Alarm",category:"Safety & Alerts",price:349,install:250,icon:"💧",image:"https://leobot.net/productimages/259.webp",desc:"Water detection alarm that sounds when the sensor reaches the set level."},
-{id:4,name:"Door & Window Alarm",category:"Security",price:349,install:200,icon:"🚪",image:"https://dummyimage.com/900x650/111827/ffffff.png&text=DOOR+%26+WINDOW+ALARM",desc:"Magnetic entry alarm for doors and windows."},
-{id:5,name:"Automatic Entry Light & Alarm",category:"Security",price:499,install:300,icon:"🚨",image:"https://www.futurelight.co.za/cdn/shop/files/PioLEDLighting-PioLEDLighting-F356S30WOoberIP65LEDSensorFloodlight6000K_3000K.png?v=1761058896&width=1024",desc:"Motion-triggered entrance lighting with an optional alarm."},
-{id:6,name:"MachineWatch Downtime Monitor",category:"Industrial Automation",price:2499,install:750,icon:"🏭",image:"https://dummyimage.com/900x650/eaf5ff/1268e8.png&text=MachineWatch+Downtime+Monitor",desc:"Real-time machine-state monitoring that records when a machine stops and how long the downtime lasts."}
+{id:1,name:"Machine Downtime Logger",category:"Business Monitoring",price:2599,install:750,icon:"🏭",image:"https://dummyimage.com/900x650/eaf5ff/1268e8.png&text=Machine+Downtime+Logger",desc:"Monitors a machine's operating light and records when the machine stops and how long the downtime lasts.",details:"The Machine Downtime Logger is designed for small factories, workshops and production businesses. It watches the machine's status light and automatically records operating and downtime periods, reducing reliance on handwritten logs or estimates.",benefits:["Shows the actual time a machine was stopped.","Helps owners identify repeated downtime patterns.","Creates clearer records for maintenance and production planning.","Reduces manual timekeeping by workers." ]},
+{id:2,name:"Smart Energy Monitor",category:"Business Monitoring",price:1599,install:500,icon:"⚡",image:"https://dummyimage.com/900x650/f1f8ff/1268e8.png&text=Smart+Energy+Monitor",desc:"Tracks electricity usage so small businesses can understand where energy is being consumed.",details:"The Smart Energy Monitor helps shops, workshops, offices and small production spaces monitor electrical consumption and identify equipment or periods that may be driving costs.",benefits:["Makes energy usage easier to understand.","Helps identify equipment with high consumption.","Supports better energy-saving decisions.","Provides useful records for comparing usage over time."]},
+{id:3,name:"Equipment Temperature Monitor",category:"Business Monitoring",price:1399,install:450,icon:"🌡️",image:"https://dummyimage.com/900x650/fff7ed/1268e8.png&text=Equipment+Temperature+Monitor",desc:"Monitors equipment temperature and provides an alert when a set limit is reached.",details:"The Equipment Temperature Monitor is suited to electrical panels, motors, pumps, refrigeration equipment and other assets where overheating can become a problem.",benefits:["Provides early warning of abnormal heat.","Helps reduce avoidable equipment damage.","Supports preventive maintenance.","Can be configured around the equipment's normal temperature range."]},
+{id:4,name:"Water Leak & Tank Level Alert",category:"Business Safety",price:1099,install:400,icon:"💧",image:"https://dummyimage.com/900x650/e9fbff/1268e8.png&text=Water+Leak+%26+Tank+Level+Alert",desc:"Detects unwanted water leaks or monitors a tank level and alerts you before a small problem becomes expensive.",details:"This solution can be adapted for small businesses, workshops, properties and water-storage systems. It can detect a leak or provide an alert when a tank reaches a configured level.",benefits:["Helps catch leaks earlier.","Reduces the risk of water damage and waste.","Supports better tank-level awareness.","Can be adapted to the installation environment."]},
+{id:5,name:"Power Failure & Recovery Monitor",category:"Business Safety",price:1299,install:400,icon:"🔌",image:"https://dummyimage.com/900x650/f5f3ff/1268e8.png&text=Power+Failure+%26+Recovery+Monitor",desc:"Records power interruptions and recovery events so small businesses can keep a clearer record of outages.",details:"The Power Failure & Recovery Monitor records when electrical power goes off and when it returns. It is useful for businesses that depend on computers, equipment, refrigeration or other electrical systems.",benefits:["Creates a record of power interruptions.","Helps identify repeated outage problems.","Supports troubleshooting after equipment resets.","Useful for businesses where outages affect operations or stock."]}
 ];
 let cart=JSON.parse(localStorage.getItem("andiCart")||"[]"),active="All";
 let customerProfile=JSON.parse(localStorage.getItem("andiCustomerProfile")||"null");
@@ -23,17 +22,48 @@ function renderCategories(){
   const cats=["All",...new Set(products.map(p=>p.category))];
   $("#categories").innerHTML=cats.map(c=>`<button class="chip ${c===active?"active":""}" onclick="setCategory('${c}')">${c}</button>`).join("");
 }
+function openProductDetails(id){
+  const p=products.find(x=>x.id===id);
+  if(!p)return;
+  const modal=$("#productDetailsModal");
+  $("#productDetailsContent").innerHTML=`
+    <div class="product-detail-top">
+      <div class="product-detail-image"><img src="${p.image}" alt="${p.name}" onerror="this.onerror=null;this.src='https://dummyimage.com/900x650/0b1220/ffffff.png&text='+encodeURIComponent(p.name)"></div>
+      <div>
+        <p class="eyebrow">${p.category}</p>
+        <h2>${p.icon} ${p.name}</h2>
+        <p class="product-detail-price">${money(p.price)}</p>
+        <p class="product-detail-install">Installation from ${money(p.install)}</p>
+      </div>
+    </div>
+    <h3>What it does</h3><p>${p.details}</p>
+    <h3>How it helps a small business</h3>
+    <ul class="product-benefits">${p.benefits.map(b=>`<li>✓ ${b}</li>`).join("")}</ul>
+    <div class="product-detail-actions">
+      <button class="btn primary" type="button" onclick="addToCart(${p.id});closeProductDetails()">Add to cart</button>
+      <a class="btn ghost" target="_blank" rel="noopener" href="https://wa.me/27793234998?text=${encodeURIComponent("Hello Andi Electronics. I would like to enquire about the "+p.name+" priced at "+money(p.price)+".")}" >Make an inquiry</a>
+    </div>`;
+  modal.classList.add("open");modal.setAttribute("aria-hidden","false");
+}
+function closeProductDetails(){
+  const modal=$("#productDetailsModal");
+  if(modal){modal.classList.remove("open");modal.setAttribute("aria-hidden","true")}
+}
 function renderProducts(){
   const q=$("#search").value.toLowerCase();
-  const list=products.filter(p=>(active==="All"||p.category===active)&&(p.name+p.desc+p.category).toLowerCase().includes(q));
+  const list=products.filter(p=>(active==="All"||p.category===active)&&(p.name+p.desc+p.category+p.details).toLowerCase().includes(q));
   $("#productGrid").innerHTML=list.length?list.map(p=>`
   <article class="product">
-    <div class="pic"><img src="${p.image}" alt="${p.name}" loading="eager" onerror="this.onerror=null;this.src='https://dummyimage.com/900x650/0b1220/ffffff.png&text=${encodeURIComponent(p.name)}'"></div>
+    <div class="pic"><img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.onerror=null;this.src='https://dummyimage.com/900x650/0b1220/ffffff.png&text='+encodeURIComponent(p.name)"></div>
     <p class="eyebrow">${p.category}</p>
     <h3>${p.name}</h3>
     <p>${p.desc}</p>
     <div class="product-meta"><span class="price">${money(p.price)}</span><span class="install">Installation from ${money(p.install)}</span></div>
-    <div class="product-row"><button class="small-btn" onclick="addToCart(${p.id})">Add to cart</button><a class="small-btn product-view-link" href="${{"1":"automatic-night-light.html","2":"motion-sensor-light.html","3":"water-level-alarm.html","4":"door-window-alarm.html","5":"automatic-entry-light-alarm.html","6":"machinewatch-downtime-monitor.html"}[p.id]}">View product</a><a class="quote-link" href="#contact">Ask about customization</a></div>
+    <div class="product-row">
+      <button class="small-btn" onclick="addToCart(${p.id})">Add to cart</button>
+      <button class="small-btn product-view-link" type="button" onclick="openProductDetails(${p.id})">Read more</button>
+      <a class="quote-link" target="_blank" rel="noopener" href="https://wa.me/27793234998?text=${encodeURIComponent("Hello Andi Electronics. I would like to enquire about the "+p.name+" priced at "+money(p.price)+".")}">Make an inquiry</a>
+    </div>
   </article>`).join(""):'<p class="empty">No products found.</p>';
 }
 function setCategory(c){active=c;renderCategories();renderProducts()}
