@@ -84,10 +84,84 @@ function productTotal(){return cart.reduce((a,x)=>a+x.price*x.qty,0)}
 function welcomeEligible(){return !!customerProfile&&!customerProfile.discountUsed}
 function welcomeDiscount(product,install,delivery){return welcomeEligible()?(product+install+delivery)*WELCOME_RATE:0}
 function saveCustomerProfile(){localStorage.setItem("andiCustomerProfile",JSON.stringify(customerProfile))}
-function openAccount(){$("#accountModal").classList.add("open");$("#accountModal").setAttribute("aria-hidden","false");$("#accountStatus").textContent="";if(customerProfile){$("#accountTitle").textContent="Your account";$("#accountName").value=customerProfile.name||"";$("#accountPhone").value=customerProfile.phone||"";$("#accountName").readOnly=true;$("#accountPhone").readOnly=true;$("#accountForm button").textContent="Account registered ✓";$("#accountForm button").disabled=true;$("#accountStatus").textContent=customerProfile.discountUsed?"Your first-order discount has already been used.":"Your 10% first-order discount is ready to use."}else{$("#accountTitle").textContent="Create your account";$("#accountName").readOnly=false;$("#accountPhone").readOnly=false;$("#accountForm button").disabled=false;$("#accountForm button").textContent="Create account & unlock 10%"}}
+let customerAccountMode="login";
+function setAccountMode(mode){
+  customerAccountMode=mode==="signup"?"signup":"login";
+  const signup=customerAccountMode==="signup";
+  $("#accountTitle").textContent=signup?"Create your account":"Welcome back";
+  $("#signupFields").hidden=!signup;
+  $("#accountName").required=signup;
+  $("#accountPhone").required=signup;
+  $("#accountPassword").autocomplete=signup?"new-password":"current-password";
+  $("#accountSubmitBtn").textContent=signup?"Create account & unlock 10%":"Login";
+  $("#accountLoginTab").classList.toggle("active",!signup);
+  $("#accountSignupTab").classList.toggle("active",signup);
+  $("#accountStatus").textContent="";
+  $("#accountStatus").className="account-status";
+}
+function openAccount(mode="login"){
+  $("#accountModal").classList.add("open");
+  $("#accountModal").setAttribute("aria-hidden","false");
+  $("#accountForm").reset();
+  setAccountMode(mode);
+  if(customerProfile){
+    $("#accountEmail").value=customerProfile.email||"";
+    $("#accountName").value=customerProfile.name||"";
+    $("#accountPhone").value=customerProfile.phone||"";
+  }
+}
 function closeAccount(){$("#accountModal").classList.remove("open");$("#accountModal").setAttribute("aria-hidden","true")}
-function registerCustomer(e){e.preventDefault();const name=$("#accountName").value.trim(),phone=$("#accountPhone").value.trim();if(!name||!phone)return;customerProfile={name,phone,discountUsed:false,registeredAt:new Date().toISOString()};saveCustomerProfile();$("#accountStatus").textContent="Account created. Your 10% first-order discount is unlocked!";$("#accountStatus").className="account-status success";$("#accountForm button").disabled=true;$("#accountForm button").textContent="10% discount unlocked ✓";syncCustomerToCheckout();updateCheckout()}
-function syncCustomerToCheckout(){if(!customerProfile)return;$("#checkoutCustomerName").value=customerProfile.name;$("#checkoutCustomerPhone").value=customerProfile.phone;$("#checkoutCustomerName").readOnly=true;$("#checkoutCustomerPhone").readOnly=true;$("#accountCheckoutNote").textContent=welcomeEligible()?"Welcome back, "+customerProfile.name+" — your 10% first-order discount is active.":"Your first-order 10% discount has already been used."}
+async function registerCustomer(e){
+  e.preventDefault();
+  const name=$("#accountName").value.trim(),phone=$("#accountPhone").value.trim(),email=$("#accountEmail").value.trim(),password=$("#accountPassword").value;
+  if(!name||!phone||!email||!password)return;
+  const button=$("#accountSubmitBtn");button.disabled=true;button.textContent="Creating account...";$("#accountStatus").textContent="Creating your secure customer account...";
+  try{
+    const response=await fetch(SUPABASE_URL+"/auth/v1/signup",{method:"POST",headers:{"apikey":SUPABASE_PUBLISHABLE_KEY,"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({email,password,data:{full_name:name,phone}})});
+    const data=await response.json();
+    if(!response.ok)throw new Error(data.error_description||data.msg||"Could not create your account.");
+    if(data.session&&data.user){
+      customerProfile={name,phone,email,discountUsed:false,registeredAt:new Date().toISOString()};
+      saveCustomerProfile();
+      $("#accountStatus").textContent="Account created successfully. Your 10% first-order discount is unlocked!";$("#accountStatus").className="account-status success";
+      syncCustomerToCheckout();updateCheckout();
+    }else{
+      $("#accountStatus").textContent="Account created. Please check your email to confirm your account, then use Login.";$("#accountStatus").className="account-status success";
+      setAccountMode("login");$("#accountEmail").value=email;
+    }
+  }catch(error){
+    console.error(error);$("#accountStatus").textContent=error.message||"Could not create your account.";$("##accountStatus")?.classList?.add("error");
+  }finally{button.disabled=false;button.textContent=customerAccountMode==="signup"?"Create account & unlock 10%":"Login"}
+}
+async function loginCustomer(e){
+  e.preventDefault();
+  const email=$("#accountEmail").value.trim(),password=$("#accountPassword").value;
+  if(!email||!password)return;
+  const button=$("#accountSubmitBtn");button.disabled=true;button.textContent="Logging in...";$("#accountStatus").textContent="Checking your account...";
+  try{
+    const response=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"apikey":SUPABASE_PUBLISHABLE_KEY,"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({email,password})});
+    const data=await response.json();
+    if(!response.ok||!data.access_token)throw new Error(data.error_description||data.msg||"Login failed. Please check your email and password.");
+    const meta=data.user?.user_metadata||{};
+    const existing=customerProfile&&customerProfile.email?.toLowerCase()===email.toLowerCase()?customerProfile:null;
+    customerProfile={name:meta.full_name||existing?.name||"",phone:meta.phone||existing?.phone||"",email,discountUsed:existing?.discountUsed||false,registeredAt:existing?.registeredAt||new Date().toISOString()};
+    saveCustomerProfile();syncCustomerToCheckout();updateCheckout();
+    $("#accountStatus").textContent="Login successful. Welcome back, "+(customerProfile.name||"customer")+"!";$("#accountStatus").className="account-status success";
+    setTimeout(closeAccount,700);
+  }catch(error){
+    console.error(error);$("#accountStatus").textContent=error.message||"Could not log in.";$("##accountStatus")?.classList?.add("error");
+  }finally{button.disabled=false;button.textContent=customerAccountMode==="signup"?"Create account & unlock 10%":"Login"}
+}
+function handleAccountSubmit(e){return customerAccountMode==="signup"?registerCustomer(e):loginCustomer(e)}
+function syncCustomerToCheckout(){
+  if(!customerProfile)return;
+  $("#checkoutCustomerName").value=customerProfile.name||"";
+  $("#checkoutCustomerPhone").value=customerProfile.phone||"";
+  if($("#checkoutEmail"))$("#checkoutEmail").value=customerProfile.email||"";
+  $("#checkoutCustomerName").readOnly=true;$("#checkoutCustomerPhone").readOnly=true;
+  if($("#checkoutEmail"))$("#checkoutEmail").readOnly=false;
+  $("#accountCheckoutNote").textContent=welcomeEligible()?"Welcome back, "+(customerProfile.name||"customer")+" — your 10% first-order discount is active.":"Your first-order 10% discount has already been used.";
+}
 function installationTotal(){return cart.reduce((a,x)=>a+x.install*x.qty,0)}
 function selectedInstallationTotal(){return $("#serviceOption")&&$("#serviceOption").value==="products_installation"?installationTotal():0}
 const deliveryLocations={
@@ -391,6 +465,12 @@ function showOwnerDashboard(){$("#ownerLogin").hidden=true;$("#ownerDashboard").
 function ownerLogout(){ownerAccessToken="";localStorage.removeItem("andiOwnerAccessToken");syncOwnerQuickButton();$("#ownerDashboard").hidden=true;$("#ownerLogin").hidden=false;$("#ownerPassword").value="";$("#ownerLoginMessage").textContent=""}
 
 $("#ownerLoginBtn").onclick=ownerLogin;
+$("#loginBtn").onclick=()=>openAccount("login");
+$("#signupBtn").onclick=()=>openAccount("signup");
+$("#accountLoginTab").onclick=()=>setAccountMode("login");
+$("#accountSignupTab").onclick=()=>setAccountMode("signup");
+$("#closeAccount").onclick=closeAccount;
+$("#accountForm").addEventListener("submit",handleAccountSubmit);
 $("#ownerQuickBtn").onclick=openOwner;
 $("#closeOwner").onclick=closeOwner;
 $("#ownerRefresh").onclick=loadOwnerOrders;
