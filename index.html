@@ -530,7 +530,7 @@ document.addEventListener("DOMContentLoaded",function(){
 var SUPA="https://qheysduwchwjfxquglxu.supabase.co";
 var KEY="sb_publishable_folUp2DzQKjcMdhrobmhEQ_PWAE9wkn";
 var token=sessionStorage.getItem("andiOwnerToken")||"";
-var statuses=["Order received","Order accepted","Preparing order","Shipped","Out for delivery","Order delivered"];
+var statuses=["Order received","Payment verification","Payment verified","Preparing order","Ready for collection","Dispatched","Out for delivery","Order delivered"];
 function byId(id){return document.getElementById(id)}
 function ownerShow(el,msg,type){el.textContent=msg;el.className="owner-message "+type}
 function ownerHeaders(){return {"apikey":KEY,"Authorization":"Bearer "+token,"Content-Type":"application/json","Accept":"application/json"}}
