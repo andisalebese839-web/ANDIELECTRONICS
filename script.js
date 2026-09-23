@@ -344,7 +344,7 @@ async function copyOrderNumber(orderNumber){
 
 /* OWNER ORDER DASHBOARD */
 let ownerAccessToken=localStorage.getItem("andiOwnerAccessToken")||"";
-function openOwner(){$("#ownerModal").classList.add("open");$("#ownerModal").setAttribute("aria-hidden","false");if(ownerAccessToken)showOwnerDashboard()}
+function syncOwnerQuickButton(){const button=$("#ownerQuickBtn");if(button)button.hidden=!ownerAccessToken}function openOwner(){$("#ownerModal").classList.add("open");$("#ownerModal").setAttribute("aria-hidden","false");if(ownerAccessToken)showOwnerDashboard()}
 function closeOwner(){$("#ownerModal").classList.remove("open");$("#ownerModal").setAttribute("aria-hidden","true")}
 function ownerMessage(message,type="info"){$("#ownerLoginMessage").textContent=message;$("#ownerLoginMessage").className="owner-message "+type}
 async function ownerLogin(){
@@ -354,7 +354,7 @@ async function ownerLogin(){
  try{
   const response=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"apikey":SUPABASE_PUBLISHABLE_KEY,"Content-Type":"application/json"},body:JSON.stringify({email,password})});
   const data=await response.json();if(!response.ok||!data.access_token)throw new Error(data.error_description||data.msg||"Owner sign-in failed.");
-  ownerAccessToken=data.access_token;localStorage.setItem("andiOwnerAccessToken",ownerAccessToken);ownerMessage("Signed in successfully.","success");showOwnerDashboard();
+  ownerAccessToken=data.access_token;localStorage.setItem("andiOwnerAccessToken",ownerAccessToken);syncOwnerQuickButton();ownerMessage("Signed in successfully.","success");showOwnerDashboard();
  }catch(error){console.error(error);ownerAccessToken="";localStorage.removeItem("andiOwnerAccessToken");ownerMessage(error.message||"Could not sign in.","error")}
  finally{$("#ownerLoginBtn").disabled=false;$("#ownerLoginBtn").textContent="Sign in"}
 }
@@ -388,9 +388,10 @@ async function updateOwnerOrderStatus(orderNumber){
  }catch(error){console.error(error);$("#ownerMessage").textContent=error.message||"Could not update order status.";$("#ownerMessage").className="owner-message error"}
 }
 function showOwnerDashboard(){$("#ownerLogin").hidden=true;$("#ownerDashboard").hidden=false;loadOwnerOrders()}
-function ownerLogout(){ownerAccessToken="";localStorage.removeItem("andiOwnerAccessToken");$("#ownerDashboard").hidden=true;$("#ownerLogin").hidden=false;$("#ownerPassword").value="";$("#ownerLoginMessage").textContent=""}
+function ownerLogout(){ownerAccessToken="";localStorage.removeItem("andiOwnerAccessToken");syncOwnerQuickButton();$("#ownerDashboard").hidden=true;$("#ownerLogin").hidden=false;$("#ownerPassword").value="";$("#ownerLoginMessage").textContent=""}
 
 $("#ownerLoginBtn").onclick=ownerLogin;
+$("#ownerQuickBtn").onclick=openOwner;
 $("#closeOwner").onclick=closeOwner;
 $("#ownerRefresh").onclick=loadOwnerOrders;
 $("#ownerLogout").onclick=ownerLogout;
@@ -412,6 +413,9 @@ $("#deliveryCity").onchange=()=>{updateDeliverySuburbs();updateCheckout()};
 $("#deliverySuburb").onchange=updateCheckout;
 $("#checkoutForm").addEventListener("submit",submitOrder);
 $("#year").textContent=new Date().getFullYear();
+syncOwnerQuickButton();
+const initialOwner=new URLSearchParams(window.location.search).get("owner");
+if(initialOwner==="1")setTimeout(openOwner,250);
 const initialTrack=new URLSearchParams(window.location.search).get("track");
 if(initialTrack){setTimeout(()=>{openTrack();$("#trackNumber").value=initialTrack;trackOrder(initialTrack)},250);}
 updateFulfilmentFields();
