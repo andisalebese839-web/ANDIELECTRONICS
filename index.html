@@ -21,11 +21,11 @@
       "@type":"OfferCatalog",
       "name":"Andi Electronics Products",
       "itemListElement":[
-        {"@type":"Offer","itemOffered":{"@type":"Product","name":"Automatic Night Light","description":"Automatic dusk-to-dawn light for bedrooms, passages and entrances."},"price":"349","priceCurrency":"ZAR","availability":"https://schema.org/InStock","url":"https://andisalebese839-web.github.io/ANDIELECTRONICS/#shop"},
-        {"@type":"Offer","itemOffered":{"@type":"Product","name":"Motion-Sensor Light","description":"Motion-activated lighting for entrances, garages, passages and outdoor areas."},"price":"449","priceCurrency":"ZAR","availability":"https://schema.org/InStock","url":"https://andisalebese839-web.github.io/ANDIELECTRONICS/#shop"},
-        {"@type":"Offer","itemOffered":{"@type":"Product","name":"Water-Level Alarm","description":"Water detection alarm that sounds when the sensor reaches the set level."},"price":"349","priceCurrency":"ZAR","availability":"https://schema.org/InStock","url":"https://andisalebese839-web.github.io/ANDIELECTRONICS/#shop"},
-        {"@type":"Offer","itemOffered":{"@type":"Product","name":"Door & Window Alarm","description":"Magnetic entry alarm for doors and windows."},"price":"349","priceCurrency":"ZAR","availability":"https://schema.org/InStock","url":"https://andisalebese839-web.github.io/ANDIELECTRONICS/#shop"},
-        {"@type":"Offer","itemOffered":{"@type":"Product","name":"Automatic Entry Light & Alarm","description":"Motion-triggered entrance lighting with an optional alarm."},"price":"499","priceCurrency":"ZAR","availability":"https://schema.org/InStock","url":"https://andisalebese839-web.github.io/ANDIELECTRONICS/#shop"}
+        {"@type":"Offer","itemOffered":{"@type":"Product","name":"Machine Downtime Logger","description":"Monitors a machine's operating light and records when the machine stops and how long the downtime lasts."},"price":"2599","priceCurrency":"ZAR","availability":"https://schema.org/InStock","url":"https://andisalebese839-web.github.io/ANDIELECTRONICS/#shop"},
+        {"@type":"Offer","itemOffered":{"@type":"Product","name":"Smart Energy Monitor","description":"Tracks electricity usage so small businesses can understand where energy is being consumed."},"price":"1599","priceCurrency":"ZAR","availability":"https://schema.org/InStock","url":"https://andisalebese839-web.github.io/ANDIELECTRONICS/#shop"},
+        {"@type":"Offer","itemOffered":{"@type":"Product","name":"Equipment Temperature Monitor","description":"Monitors equipment temperature and provides an alert when a set limit is reached."},"price":"1399","priceCurrency":"ZAR","availability":"https://schema.org/InStock","url":"https://andisalebese839-web.github.io/ANDIELECTRONICS/#shop"},
+        {"@type":"Offer","itemOffered":{"@type":"Product","name":"Water Leak & Tank Level Alert","description":"Detects unwanted water leaks or monitors a tank level and alerts you before a small problem becomes expensive."},"price":"1099","priceCurrency":"ZAR","availability":"https://schema.org/InStock","url":"https://andisalebese839-web.github.io/ANDIELECTRONICS/#shop"},
+        {"@type":"Offer","itemOffered":{"@type":"Product","name":"Power Failure & Recovery Monitor","description":"Records power interruptions and recovery events so small businesses can keep a clearer record of outages."},"price":"1299","priceCurrency":"ZAR","availability":"https://schema.org/InStock","url":"https://andisalebese839-web.github.io/ANDIELECTRONICS/#shop"}
       ]
     }
   }
@@ -58,7 +58,22 @@
 .service-request-status.error{background:#fff2f0;color:#b42318}
 @media(max-width:720px){.service-request-card{padding:18px}.service-cta{align-items:flex-start;flex-direction:column}}
 </style>
-</head>
+<style>
+.product-details-modal{position:fixed;inset:0;background:rgba(7,13,25,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:1050}
+.product-details-modal.open{display:flex}
+.product-details-card{width:min(820px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:24px;padding:28px;box-shadow:0 24px 80px rgba(0,0,0,.28)}
+.product-details-card .cart-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:12px}
+.product-details-card .cart-head button{border:0;background:transparent;font-size:2rem;cursor:pointer;line-height:1}
+.product-detail-top{display:grid;grid-template-columns:minmax(220px,340px) 1fr;gap:24px;align-items:center}
+.product-detail-image img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:18px;background:#eef6ff}
+.product-detail-price{font-size:2rem;font-weight:900;margin:8px 0 2px;color:#1268e8}
+.product-detail-install{color:#64748b;margin-top:0}
+.product-details-card h3{margin-top:24px;margin-bottom:8px}
+.product-details-card p{line-height:1.65;color:#526b88}
+.product-benefits{display:grid;gap:10px;padding-left:0;list-style:none;color:#334155}
+.product-detail-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+@media(max-width:720px){.product-details-card{padding:18px}.product-detail-top{grid-template-columns:1fr}.product-detail-actions .btn{width:100%;box-sizing:border-box;text-align:center}}
+</style></head>
 <body>
 <header class="site-header">
   <div class="container nav">
@@ -97,7 +112,7 @@
 
 <section id="shop" class="section">
   <div class="container">
-    <div class="section-head"><div><p class="eyebrow">ANDI ELECTRONICS SHOP</p><h2>Smart products for everyday problems</h2></div><input id="search" class="search" type="search" placeholder="Search our products..."></div>
+    <div class="section-head"><div><p class="eyebrow">ANDI ELECTRONICS SHOP</p><h2>Practical technology for small business problems</h2></div><input id="search" class="search" type="search" placeholder="Search our products..."></div>
     <div class="chips" id="categories"></div>
     <div class="product-grid" id="productGrid"></div>
   </div>
@@ -308,6 +323,12 @@
   </div>
 </div>
 <div class="track-modal" id="trackModal" aria-hidden="true"><div class="track-card"><div class="cart-head"><div><p class="eyebrow">ORDER TRACKING</p><h2>Track your order</h2></div><button type="button" id="closeTrack" aria-label="Close tracking">×</button></div><p class="track-intro">Enter the unique order number you received after placing your order.</p><form id="trackForm" class="track-form"><input id="trackNumber" required placeholder="Example: AE-20260922-7F3A91BC" autocomplete="off"><button class="btn primary" type="submit">Track order</button></form><div id="trackResult" class="track-result" hidden></div></div></div>
+<div class="product-details-modal" id="productDetailsModal" aria-hidden="true">
+  <div class="product-details-card">
+    <div class="cart-head"><div><p class="eyebrow">PRODUCT DETAILS</p><h2>Business solution</h2></div><button type="button" onclick="closeProductDetails()" aria-label="Close product details">×</button></div>
+    <div id="productDetailsContent"></div>
+  </div>
+</div>
 <script src="script.js?v=10"></script>
 <script>
 (function(){
