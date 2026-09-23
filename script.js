@@ -41,7 +41,7 @@ function openProductDetails(id){
     <ul class="product-benefits">${p.benefits.map(b=>`<li>✓ ${b}</li>`).join("")}</ul>
     <div class="product-detail-actions">
       <button class="btn primary" type="button" onclick="addToCart(${p.id});closeProductDetails()">Add to cart</button>
-      <a class="btn ghost" target="_blank" rel="noopener" href="https://wa.me/27793234998?text=${encodeURIComponent("Hello Andi Electronics. I would like to enquire about the "+p.name+" priced at "+money(p.price)+".")}" >Make an inquiry</a>
+      <a class="btn ghost" target="_blank" rel="noopener" href="https://wa.me/27793234998?text=${encodeURIComponent("Hello AE Technologies. I would like to enquire about the "+p.name+" priced at "+money(p.price)+".")}" >Make an inquiry</a>
     </div>`;
   modal.classList.add("open");modal.setAttribute("aria-hidden","false");
 }
@@ -62,7 +62,7 @@ function renderProducts(){
     <div class="product-row">
       <button class="small-btn" onclick="addToCart(${p.id})">Add to cart</button>
       <button class="small-btn product-view-link" type="button" onclick="openProductDetails(${p.id})">Read more</button>
-      <a class="quote-link" target="_blank" rel="noopener" href="https://wa.me/27793234998?text=${encodeURIComponent("Hello Andi Electronics. I would like to enquire about the "+p.name+" priced at "+money(p.price)+".")}">Make an inquiry</a>
+      <a class="quote-link" target="_blank" rel="noopener" href="https://wa.me/27793234998?text=${encodeURIComponent("Hello AE Technologies. I would like to enquire about the "+p.name+" priced at "+money(p.price)+".")}">Make an inquiry</a>
     </div>
   </article>`).join(""):'<p class="empty">No products found.</p>';
 }
@@ -238,7 +238,7 @@ async function submitOrder(event){
   const orderNumber=createOrderNumber();
   updateCheckout();
   $("#orderNumberField").value=orderNumber;
-  $("#orderSubjectField").value="New Andi Electronics Order — "+orderNumber;
+  $("#orderSubjectField").value="New AE Technologies Order — "+orderNumber;
   const trackingUrl=window.location.origin+window.location.pathname+"?track="+encodeURIComponent(orderNumber)+"#track";
   if($("#trackingLinkField")) $("#trackingLinkField").value=trackingUrl;
   const form=$("#checkoutForm"),button=$("#submitOrderBtn");
@@ -318,7 +318,7 @@ async function submitOrder(event){
       <div class="confirmation-actions">
         <button type="button" class="small-btn" onclick="copyOrderNumber('${orderNumber}')">Copy order number</button>
         <a class="small-btn primary" href="${trackingUrl}">Track my order</a>
-        <a class="small-btn whatsapp-order" target="_blank" rel="noopener" href="https://wa.me/27793234998?text=${encodeURIComponent("Hello Andi Electronics. My order number is "+orderNumber+". My phone number is "+customerPhone+". Please confirm my order.")}">Message us on WhatsApp</a>
+        <a class="small-btn whatsapp-order" target="_blank" rel="noopener" href="https://wa.me/27793234998?text=${encodeURIComponent("Hello AE Technologies. My order number is "+orderNumber+". My phone number is "+customerPhone+". Please confirm my order.")}">Message us on WhatsApp</a>
       </div>`;
     showCheckoutStatus("Order created successfully. Your order number is "+orderNumber+".","success");
   }catch(error){
