@@ -51,7 +51,7 @@ body{background:#f4f7fb}.admin-wrap{max-width:1180px;margin:auto;padding:32px 20
 "use strict";
 var URL="https://qheysduwchwjfxquglxu.supabase.co";
 var KEY="sb_publishable_folUp2DzQKjcMdhrobmhEQ_PWAE9wkn";
-var statuses=["Order received","Order accepted","Preparing order","Shipped","Out for delivery","Order delivered"];
+var statuses=["Order received","Order accepted","Preparing order","Shipped","Out for delivery","Delivered","Order delivered"];
 var token=sessionStorage.getItem("andiAdminAccessToken")||"";
 function $(id){return document.getElementById(id)}
 function show(el,text,type){el.textContent=text;el.className="admin-message show "+type}
@@ -98,7 +98,7 @@ function card(o){
  var items=[];
  try{items=Array.isArray(o.products)?o.products:JSON.parse(o.products||"[]")}catch(e){}
  var itemText=items.map(function(x){return "<li>"+esc(x.name)+" × "+esc(x.qty)+"</li>"}).join("");
- var current=o.status==="Delivered"?"Order delivered":o.status;
+ var current=o.status;
  var opts=statuses.map(function(s){return '<option value="'+esc(s)+'"'+(s===current?" selected":"")+'>'+esc(s)+"</option>"}).join("");
  return '<article class="order-card">'+
  '<div class="order-head"><div><div class="order-number">'+esc(o.order_number)+'</div><div class="order-meta">'+esc(new Date(o.created_at).toLocaleString())+'</div></div><strong>'+money(o.order_total)+'</strong></div>'+
@@ -112,7 +112,7 @@ async function saveStatus(btn){
  var select=btn.previousElementSibling,id=btn.getAttribute("data-id"),number=btn.getAttribute("data-number"),newStatus=select.value;
  btn.disabled=true;btn.textContent="Saving...";
  try{
-  var response=await fetch(URL+"/rest/v1/orders?id=eq."+encodeURIComponent(id),{method:"PATCH",headers:Object.assign({},headers(),{"Prefer":"return=representation"}),body:JSON.stringify({status:newStatus,updated_at:new Date().toISOString()})});
+  var response=await fetch(URL+"/rest/v1/orders?id=eq."+encodeURIComponent(id),{method:"PATCH",headers:Object.assign({},headers(),{"Prefer":"return=representation"}),body:JSON.stringify({status:newStatus})});
   var data=await response.json().catch(function(){return []});
   if(!response.ok)throw new Error(data.message||data.hint||data.details||("Could not update order ("+response.status+")"));
   if(!Array.isArray(data)||!data.length)throw new Error("No order was updated.");
