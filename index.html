@@ -525,7 +525,7 @@ function enhancedSync(){
   if(n)n.value=customerProfile.name||"";
   if(e)e.value=customerProfile.email||"";
   if(p)p.value=customerProfile.phone||"";
-  if(n)n.readOnly=true;if(p)p.readOnly=true;
+  if(n)n.readOnly=false;if(p)p.readOnly=false;
   if(note)note.textContent=customerProfile.discountUsed?"Your first-order 10% discount has already been used.":"Welcome back, "+customerProfile.name+" — your 10% first-order discount is active.";
 }
 document.addEventListener("DOMContentLoaded",function(){
