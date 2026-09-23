@@ -7,8 +7,43 @@ const products=[
 ];
 let cart=JSON.parse(localStorage.getItem("andiCart")||"[]"),active="All";
 let customerProfile=JSON.parse(localStorage.getItem("andiCustomerProfile")||"null");
+function customerInitials(name,email=""){
+  const clean=String(name||"").trim();
+  if(clean){
+    const parts=clean.split(/\\s+/).filter(Boolean);
+    return (parts.length>1?parts[0][0]+parts[parts.length-1][0]:parts[0].slice(0,2)).toUpperCase();
+  }
+  return String(email||"CU").slice(0,2).toUpperCase();
+}
+function syncCustomerHeader(){
+  const loggedIn=!!customerProfile;
+  const loginButton=$("#loginBtn"),signupButton=$("#signupBtn"),avatar=$("#accountAvatar");
+  if(loginButton)loginButton.hidden=loggedIn;
+  if(signupButton)signupButton.hidden=loggedIn;
+  if(avatar){
+    avatar.hidden=!loggedIn;
+    avatar.querySelector("span").textContent=customerInitials(customerProfile?.name,customerProfile?.email);
+    avatar.setAttribute("aria-label",loggedIn?"Signed in as "+(customerProfile?.name||customerProfile?.email||"customer"):"Customer account");
+  }
+  if($("#accountAvatarName"))$("#accountAvatarName").textContent=customerProfile?.name||"Customer";
+  if($("#accountAvatarEmail"))$("#accountAvatarEmail").textContent=customerProfile?.email||"";
+}
+function toggleAccountPopover(){
+  const pop=$("#accountPopover");
+  if(pop)pop.hidden=!pop.hidden;
+}
+function customerLogout(){
+  customerProfile=null;
+  localStorage.removeItem("andiCustomerProfile");
+  if(typeof ownerLogout==="function")ownerLogout();
+  syncCustomerHeader();
+  closeAccount();
+  updateCheckout();
+}
+
 const WELCOME_RATE=0.10;
 const SUPABASE_URL="https://qheysduwchwjfxquglxu.supabase.co";
+const SITE_URL="https://andisalebese839-web.github.io/ANDIELECTRONICS/";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_folUp2DzQKjcMdhrobmhEQ_PWAE9wkn";
 const SUPABASE_HEADERS={
   "apikey":SUPABASE_PUBLISHABLE_KEY,
@@ -117,12 +152,12 @@ async function registerCustomer(e){
   if(!name||!phone||!email||!password)return;
   const button=$("#accountSubmitBtn");button.disabled=true;button.textContent="Creating account...";$("#accountStatus").textContent="Creating your secure customer account...";
   try{
-    const response=await fetch(SUPABASE_URL+"/auth/v1/signup",{method:"POST",headers:{"apikey":SUPABASE_PUBLISHABLE_KEY,"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({email,password,data:{full_name:name,phone}})});
+    const response=await fetch(SUPABASE_URL+"/auth/v1/signup?redirect_to="+encodeURIComponent(SITE_URL),{method:"POST",headers:{"apikey":SUPABASE_PUBLISHABLE_KEY,"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({email,password,data:{full_name:name,phone}})});
     const data=await response.json();
     if(!response.ok)throw new Error(data.error_description||data.msg||"Could not create your account.");
     if(data.session&&data.user){
       customerProfile={name,phone,email,discountUsed:false,registeredAt:new Date().toISOString()};
-      saveCustomerProfile();
+      saveCustomerProfile();syncCustomerHeader();
       $("#accountStatus").textContent="Account created successfully. Your 10% first-order discount is unlocked!";$("#accountStatus").className="account-status success";
       syncCustomerToCheckout();updateCheckout();
     }else{
@@ -156,10 +191,11 @@ async function loginCustomer(e){
       return;
     }
 
+    ownerAccessToken="";localStorage.removeItem("andiOwnerAccessToken");syncOwnerQuickButton();
     const meta=data.user?.user_metadata||{};
     const existing=customerProfile&&customerProfile.email?.toLowerCase()===email.toLowerCase()?customerProfile:null;
     customerProfile={name:meta.full_name||existing?.name||"",phone:meta.phone||existing?.phone||"",email,discountUsed:existing?.discountUsed||false,registeredAt:existing?.registeredAt||new Date().toISOString()};
-    saveCustomerProfile();syncCustomerToCheckout();updateCheckout();
+    saveCustomerProfile();syncCustomerHeader();syncCustomerToCheckout();updateCheckout();
     $("#accountStatus").textContent="Login successful. Welcome back, "+(customerProfile.name||"customer")+"!";$("#accountStatus").className="account-status success";
     setTimeout(closeAccount,700);
   }catch(error){
@@ -432,7 +468,21 @@ async function copyOrderNumber(orderNumber){
 
 /* OWNER ORDER DASHBOARD */
 let ownerAccessToken=localStorage.getItem("andiOwnerAccessToken")||"";
-function syncOwnerQuickButton(){const button=$("#ownerQuickBtn");if(button)button.hidden=!ownerAccessToken}function openOwner(){$("#ownerModal").classList.add("open");$("#ownerModal").setAttribute("aria-hidden","false");if(ownerAccessToken)showOwnerDashboard()}
+function syncOwnerQuickButton(){const button=$("#ownerQuickBtn");if(button)button.hidden=!ownerAccessToken}
+async function verifyOwnerSession(){
+  if(!ownerAccessToken){syncOwnerQuickButton();return false}
+  try{
+    const response=await fetch(SUPABASE_URL+"/auth/v1/user",{headers:{"apikey":SUPABASE_PUBLISHABLE_KEY,"Authorization":"Bearer "+ownerAccessToken,"Accept":"application/json"}});
+    const user=response.ok?await response.json():null;
+    const valid=!!user?.email&&user.email.toLowerCase()===OWNER_EMAIL.toLowerCase();
+    if(!valid){ownerAccessToken="";localStorage.removeItem("andiOwnerAccessToken")}
+    syncOwnerQuickButton();
+    return valid;
+  }catch(error){
+    console.warn("Could not validate owner session.",error);
+    ownerAccessToken="";localStorage.removeItem("andiOwnerAccessToken");syncOwnerQuickButton();return false;
+  }
+}function openOwner(){$("#ownerModal").classList.add("open");$("#ownerModal").setAttribute("aria-hidden","false");if(ownerAccessToken)showOwnerDashboard()}
 function closeOwner(){$("#ownerModal").classList.remove("open");$("#ownerModal").setAttribute("aria-hidden","true")}
 function ownerMessage(message,type="info"){$("#ownerLoginMessage").textContent=message;$("#ownerLoginMessage").className="owner-message "+type}
 async function ownerLogin(){
@@ -479,6 +529,9 @@ function showOwnerDashboard(){$("#ownerLogin").hidden=true;$("#ownerDashboard").
 function ownerLogout(){ownerAccessToken="";localStorage.removeItem("andiOwnerAccessToken");syncOwnerQuickButton();$("#ownerDashboard").hidden=true;$("#ownerLogin").hidden=false;$("#ownerPassword").value="";$("#ownerLoginMessage").textContent=""}
 
 $("#ownerLoginBtn").onclick=ownerLogin;
+$("#accountAvatar").onclick=toggleAccountPopover;
+$("#customerLogoutBtn").onclick=customerLogout;
+document.addEventListener("click",e=>{const area=$(".account-area"),pop=$("#accountPopover");if(area&&pop&&!area.contains(e.target))pop.hidden=true});
 $("#loginBtn").onclick=()=>openAccount("login");
 $("#signupBtn").onclick=()=>openAccount("signup");
 $("#accountLoginTab").onclick=()=>setAccountMode("login");
@@ -507,7 +560,9 @@ $("#deliveryCity").onchange=()=>{updateDeliverySuburbs();updateCheckout()};
 $("#deliverySuburb").onchange=updateCheckout;
 $("#checkoutForm").addEventListener("submit",submitOrder);
 $("#year").textContent=new Date().getFullYear();
+syncCustomerHeader();
 syncOwnerQuickButton();
+verifyOwnerSession();
 const initialOwner=new URLSearchParams(window.location.search).get("owner");
 if(initialOwner==="1")setTimeout(openOwner,250);
 const initialTrack=new URLSearchParams(window.location.search).get("track");
