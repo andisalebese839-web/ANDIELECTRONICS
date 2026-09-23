@@ -109,20 +109,24 @@ function deliveryChargeBreakdown(){
   return '<div class="summary-line"><span>Delivery fee</span><strong>R90.00</strong></div><div class="summary-line"><span>Shipping fee</span><strong>R120.00</strong></div>';
 }
 function updateDeliveryLocations(){
-  const province=$("#deliveryProvince"),city=$("#deliveryCity"),suburb=$("#deliverySuburb"),area=$("#deliveryArea");
-  if(!province||!city||!suburb)return;
+  const province=$("#deliveryProvince"),city=$("#deliveryCity"),area=$("#deliveryArea");
+  if(!province||!city)return;
   const cities=deliveryLocations[province.value]||[];
   city.innerHTML=cities.length?'<option value="">Select city / town</option>'+cities.map(x=>`<option>${x}</option>`).join(""):'<option value="">Select province first</option>';
   city.disabled=!cities.length;
-  suburb.innerHTML='<option value="">Select suburb</option>';
-  suburb.disabled=true;
+  const suburb=$("#deliverySuburb");
+  if(suburb){
+    suburb.value="";
+    suburb.disabled=false;
+  }
   if(area)area.value="";
 }
 function updateDeliverySuburbs(){
   const city=$("#deliveryCity"),suburb=$("#deliverySuburb"),area=$("#deliveryArea");
-  if(!city||!suburb)return;
-  suburb.disabled=!city.value;
-  suburb.innerHTML=city.value?'<option value="">Select suburb</option><option>Other suburb</option>':'<option value="">Select city first</option>';
+  if(!city)return;
+  if(suburb){
+    suburb.disabled=false;
+  }
   if(area)area.value=city.value;
 }
 
