@@ -511,7 +511,7 @@ async function loadOwnerOrders(){
    const items=Array.isArray(order.products)?order.products:[],itemText=items.map(item=>item.name+" × "+item.qty).join(" • ")||"Order details unavailable",status=order.status||"Order received";
    return `<article class="owner-order"><div class="owner-order-head"><div><strong>${escapeHtml(order.order_number||"Order")}</strong><small>${new Date(order.created_at||Date.now()).toLocaleString()}</small></div><strong>${money(order.order_total||0)}</strong></div>
    <div class="owner-grid"><div><small>Customer</small><strong>${escapeHtml(order.customer_name||"—")}</strong></div><div><small>Phone</small><strong>${escapeHtml(order.customer_phone||"—")}</strong></div><div><small>Fulfilment</small><strong>${escapeHtml(order.fulfilment||"—")}</strong></div><div><small>Email</small><strong>${escapeHtml(order.customer_email||"—")}</strong></div><div><small>Items</small><strong>${escapeHtml(itemText)}</strong></div><div><small>Area</small><strong>${escapeHtml(order.delivery_area||"Collection")}</strong></div></div>
-   <div class="owner-status"><label><strong>Order status</strong></label><select data-order-number="${escapeHtml(order.order_number||"")}" class="owner-status-select">${["Order received","Payment verification","Payment verified","Preparing order","Ready for collection","Dispatched","Out for delivery","Order delivered"].map(x=>`<option ${x===status?"selected":""}>${x}</option>`).join("")}</select><button type="button" class="small-btn owner-save-status" data-order-number="${escapeHtml(order.order_number||"")}">Update status</button></div></article>`;
+   <div class="owner-status"><label><strong>Order status</strong></label><select data-order-number="${escapeHtml(order.order_number||"")}" class="owner-status-select">${["Order received","Order accepted","Preparing order","Shipped","Out for delivery","Delivered","Order delivered"].map(x=>`<option ${x===status?"selected":""}>${x}</option>`).join("")}</select><button type="button" class="small-btn owner-save-status" data-order-number="${escapeHtml(order.order_number||"")}">Update status</button></div></article>`;
   }).join("");
   document.querySelectorAll(".owner-save-status").forEach(button=>button.onclick=()=>updateOwnerOrderStatus(button.dataset.orderNumber));
  }catch(error){console.error(error);$("#ownerOrders").innerHTML=`<div class="owner-message error">${escapeHtml(error.message||"Could not load orders.")}</div>`}
@@ -519,9 +519,9 @@ async function loadOwnerOrders(){
 async function updateOwnerOrderStatus(orderNumber){
  const select=document.querySelector(".owner-status-select[data-order-number='"+CSS.escape(orderNumber)+"']");if(!select)return;
  try{
-  const status=select.value,response=await fetch(SUPABASE_URL+"/rest/v1/orders?order_number=eq."+encodeURIComponent(orderNumber),{method:"PATCH",headers:{...ownerHeaders(),"Prefer":"return=minimal"},body:JSON.stringify({status})});
+  const status=select.value,response=await fetch(SUPABASE_URL+"/rest/v1/orders?order_number=eq."+encodeURIComponent(orderNumber),{method:"PATCH",headers:{...ownerHeaders(),"Prefer":"return=representation"},body:JSON.stringify({status})});
   if(response.status===401){ownerLogout();throw new Error("Your owner session has expired. Please sign in again.")}
-  if(!response.ok){const message=await response.text();throw new Error(message||"Could not update order status.")}
+  if(!response.ok){const message=await response.text();let detail=message;try{const parsed=JSON.parse(message);detail=parsed.message||parsed.hint||parsed.details||message}catch(e){}throw new Error(detail||"Could not update order status.")} const updated=await response.json(); if(!Array.isArray(updated)||updated.length!==1)throw new Error("No order was updated. Check your admin permissions in Supabase.");
   $("#ownerMessage").textContent=orderNumber+" updated to "+status+".";$("#ownerMessage").className="owner-message success";
   await loadOwnerOrders();
  }catch(error){console.error(error);$("#ownerMessage").textContent=error.message||"Could not update order status.";$("#ownerMessage").className="owner-message error"}
