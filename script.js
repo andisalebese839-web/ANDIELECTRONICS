@@ -1,4 +1,4 @@
-const products=[
+const products=[{id:6,name:"Custom Artwork",category:"AE Art",price:0,install:0,icon:"🎨",image:"https://dummyimage.com/900x650/f5f7ff/1268e8.png&text=Custom+Artwork",desc:"Commission a drawing or painting created to your idea, reference photo, style or space.",details:"Tell AE Technologies what you want created. Request a custom portrait, drawing, painting, abstract piece, business artwork or another original concept. We will review the brief and provide a quotation before work begins.",benefits:["Artwork made to your requested idea or reference.","Choose the subject, style, size and finish.","Suitable for gifts, homes, offices and businesses.","Personalised quotation before production."]},
 {id:1,name:"Machine Downtime Logger",category:"Business Monitoring",price:2599,install:750,icon:"🏭",image:"https://dummyimage.com/900x650/eaf5ff/1268e8.png&text=Machine+Downtime+Logger",desc:"Monitors a machine's operating light and records when the machine stops and how long the downtime lasts.",details:"The Machine Downtime Logger is designed for small factories, workshops and production businesses. It watches the machine's status light and automatically records operating and downtime periods, reducing reliance on handwritten logs or estimates.",benefits:["Shows the actual time a machine was stopped.","Helps owners identify repeated downtime patterns.","Creates clearer records for maintenance and production planning.","Reduces manual timekeeping by workers." ]},
 {id:2,name:"Smart Energy Monitor",category:"Business Monitoring",price:1599,install:500,icon:"⚡",image:"https://dummyimage.com/900x650/f1f8ff/1268e8.png&text=Smart+Energy+Monitor",desc:"Tracks electricity usage so small businesses can understand where energy is being consumed.",details:"The Smart Energy Monitor helps shops, workshops, offices and small production spaces monitor electrical consumption and identify equipment or periods that may be driving costs.",benefits:["Makes energy usage easier to understand.","Helps identify equipment with high consumption.","Supports better energy-saving decisions.","Provides useful records for comparing usage over time."]},
 {id:3,name:"Equipment Temperature Monitor",category:"Business Monitoring",price:1399,install:450,icon:"🌡️",image:"https://dummyimage.com/900x650/fff7ed/1268e8.png&text=Equipment+Temperature+Monitor",desc:"Monitors equipment temperature and provides an alert when a set limit is reached.",details:"The Equipment Temperature Monitor is suited to electrical panels, motors, pumps, refrigeration equipment and other assets where overheating can become a problem.",benefits:["Provides early warning of abnormal heat.","Helps reduce avoidable equipment damage.","Supports preventive maintenance.","Can be configured around the equipment's normal temperature range."]},
@@ -57,6 +57,7 @@ function renderCategories(){
   const cats=["All",...new Set(products.map(p=>p.category))];
   $("#categories").innerHTML=cats.map(c=>`<button class="chip ${c===active?"active":""}" onclick="setCategory('${c}')">${c}</button>`).join("");
 }
+function openCustomArtRequest(){const modal=$("#serviceRequestModal");if(!modal)return;modal.classList.add("open");modal.setAttribute("aria-hidden","false");const select=$("#serviceRequestType");if(select)select.value="Custom Artwork";const status=$("#serviceRequestStatus");if(status){status.textContent="Tell us what you want drawn or painted and AE Technologies will review it and provide a quotation.";status.className="service-request-status";}}
 function openProductDetails(id){
   const p=products.find(x=>x.id===id);
   if(!p)return;
@@ -442,7 +443,7 @@ async function submitOrder(event){
         <strong>${fulfilmentMessage}</strong>
         <span>Please note: The 3–4 week period is an estimated preparation time. We will notify you when your order is ready for collection or has been prepared for delivery.</span>
       </div>
-      <div class="confirmation-actions">
+      <div class="confirmation-actions"><button type="button" class="small-btn primary" onclick="continueBrowsingAfterOrder()">Continue browsing AE Technologies</button>
         <button type="button" class="small-btn" onclick="copyOrderNumber('${orderNumber}')">Copy order number</button>
         <a class="small-btn primary" href="${trackingUrl}">Track my order</a>
         <a class="small-btn" href="mailto:${encodeURIComponent(customerEmail)}?subject=${encodeURIComponent("Your AE Technologies order tracking link — "+orderNumber)}&body=${encodeURIComponent("Hello "+form.elements.customer_name.value.trim()+",\n\nHere is your AE Technologies tracking link:\n"+trackingUrl+"\n\nYour order number is "+orderNumber+".\n\nRegards,\nAE Technologies")}">Email my tracking link</a>
@@ -572,3 +573,4 @@ updateFulfilmentFields();
 updateDeliveryLocations();
 if(customerProfile){syncCustomerToCheckout()}
 renderCategories();renderProducts();renderCart();
+function continueBrowsingAfterOrder(){closeCheckout();setTimeout(()=>document.getElementById("shop")?.scrollIntoView({behavior:"smooth",block:"start"}),80);}
