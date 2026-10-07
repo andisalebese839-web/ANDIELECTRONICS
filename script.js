@@ -137,13 +137,27 @@ function setAccountMode(mode){
 function openAccount(mode="login"){
   $("#accountModal").classList.add("open");
   $("#accountModal").setAttribute("aria-hidden","false");
+  if(customerProfile){showAccountDashboard();return}
+  $("#accountAuthView").hidden=false;
+  $("#accountDashboard").hidden=true;
   $("#accountForm").reset();
   setAccountMode(mode);
-  if(customerProfile){
-    $("#accountEmail").value=customerProfile.email||"";
-    $("#accountName").value=customerProfile.name||"";
-    $("#accountPhone").value=customerProfile.phone||"";
-  }
+}
+function showAccountDashboard(){
+  const p=customerProfile||{};
+  $("#accountAuthView").hidden=true;
+  $("#accountDashboard").hidden=false;
+  $("#accountTitle").textContent="Welcome, "+(p.name||"Customer");
+  const saved=JSON.parse(localStorage.getItem("aeSavedAddress")||"null")||{};
+  const orders=JSON.parse(localStorage.getItem("aeCustomerOrders")||"[]");
+  const addressText=saved.address?[saved.address,saved.suburb,saved.city,saved.province,saved.postal].filter(Boolean).join(", "):"No saved delivery address yet.";
+  $("#accountDashboard").innerHTML='<div class="account-dashboard-grid"><div class="account-profile-panel"><div class="customer-avatar customer-avatar-large">'+customerInitials(p.name,p.email)+'</div><div><strong>'+escapeAccount(p.name||"Customer")+'</strong><span>'+escapeAccount(p.email||"")+'</span><small>'+escapeAccount(p.phone||"")+'</small></div></div><div class="account-menu-grid"><button type="button" class="account-menu-card" id="accountAddressBtn"><span class="account-menu-icon">⌂</span><strong>Saved address</strong><small>'+escapeAccount(addressText)+'</small></button><button type="button" class="account-menu-card" id="accountOrdersBtn"><span class="account-menu-icon">✓</span><strong>Track my orders</strong><small>'+(orders.length?orders.length+" order"+(orders.length===1?"":"s")+" saved on this device":"Enter an order number to track")+'</small></button><button type="button" class="account-menu-card" id="accountShopBtn"><span class="account-menu-icon">🛒</span><strong>Continue shopping</strong><small>Browse AE Technologies solutions</small></button><button type="button" class="account-menu-card" id="accountLogoutBtn"><span class="account-menu-icon">↪</span><strong>Log out</strong><small>Sign out of this customer account</small></button></div></div><div id="accountAddressEditor" hidden><div class="account-subhead"><strong>Saved delivery address</strong><button type="button" class="small-btn" id="accountBackBtn">Back</button></div><form id="savedAddressForm" class="account-form"><label>Street / house number<input id="savedAddress" value="'+escapeAccount(saved.address||"")+'" autocomplete="street-address" placeholder="Street, house/unit number"></label><label>Suburb<input id="savedSuburb" value="'+escapeAccount(saved.suburb||"")+'" autocomplete="address-level3" placeholder="Suburb"></label><label>City<input id="savedCity" value="'+escapeAccount(saved.city||"")+'" autocomplete="address-level2" placeholder="City"></label><label>Province<input id="savedProvince" value="'+escapeAccount(saved.province||"")+'" placeholder="Province"></label><label>Postal code<input id="savedPostal" value="'+escapeAccount(saved.postal||"")+'" inputmode="numeric" autocomplete="postal-code" placeholder="Postal code"></label><button class="btn primary" type="submit">Save address</button><div id="savedAddressStatus" class="account-status" role="status"></div></form></div>';
+  $("#accountAddressBtn").onclick=()=>{$("#accountDashboard").hidden=true;$("#accountAddressEditor").hidden=false};
+  $("#accountBackBtn").onclick=showAccountDashboard;
+  $("#savedAddressForm").onsubmit=e=>{e.preventDefault();const data={address:$("#savedAddress").value.trim(),suburb:$("#savedSuburb").value.trim(),city:$("#savedCity").value.trim(),province:$("#savedProvince").value.trim(),postal:$("#savedPostal").value.trim()};localStorage.setItem("aeSavedAddress",JSON.stringify(data));$("#savedAddressStatus").textContent="Address saved successfully.";$("#savedAddressStatus").className="account-status success";setTimeout(showAccountDashboard,500)};
+  $("#accountOrdersBtn").onclick=()=>{closeAccount();openTrack();const last=orders[0]?.orderNumber;if(last){$("#trackNumber").value=last;trackOrder(last)}};
+  $("#accountShopBtn").onclick=()=>{closeAccount();document.getElementById("shop").scrollIntoView({behavior:"smooth"})};
+  $("#accountLogoutBtn").onclick=()=>{customerProfile=null;localStorage.removeItem("andiCustomerProfile");syncCustomerHeader();closeAccount();updateCheckout()};
 }
 function closeAccount(){$("#accountModal").classList.remove("open");$("#accountModal").setAttribute("aria-hidden","true")}
 async function registerCustomer(e){
