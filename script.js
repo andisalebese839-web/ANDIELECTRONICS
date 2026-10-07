@@ -527,9 +527,7 @@ function showOwnerDashboard(){$("#ownerLogin").hidden=true;$("#ownerDashboard").
 function ownerLogout(){ownerAccessToken="";localStorage.removeItem("andiOwnerAccessToken");syncOwnerQuickButton();$("#ownerDashboard").hidden=true;$("#ownerLogin").hidden=false;$("#ownerPassword").value="";$("#ownerLoginMessage").textContent=""}
 
 $("#ownerLoginBtn").onclick=ownerLogin;
-$("#accountAvatar").onclick=toggleAccountPopover;
-$("#customerLogoutBtn").onclick=customerLogout;
-document.addEventListener("click",e=>{const area=$(".account-area"),pop=$("#accountPopover");if(area&&pop&&!area.contains(e.target))pop.hidden=true});
+$("#accountAvatar").onclick=()=>openAccount("login");
 $("#loginBtn").onclick=()=>openAccount("login");
 $("#signupBtn").onclick=()=>openAccount("signup");
 $("#accountLoginTab").onclick=()=>setAccountMode("login");
