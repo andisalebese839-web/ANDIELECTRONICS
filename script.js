@@ -51,6 +51,7 @@ const SUPABASE_HEADERS={
   "Accept":"application/json"
 };
 const $=s=>document.querySelector(s),money=n=>"R"+Number(n).toFixed(2);
+function escapeAccount(v){return String(v??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char]))}
 
 function renderCategories(){
   const cats=["All",...new Set(products.map(p=>p.category))];
@@ -540,14 +541,14 @@ async function updateOwnerOrderStatus(orderNumber){
 function showOwnerDashboard(){$("#ownerLogin").hidden=true;$("#ownerDashboard").hidden=false;loadOwnerOrders()}
 function ownerLogout(){ownerAccessToken="";localStorage.removeItem("andiOwnerAccessToken");syncOwnerQuickButton();$("#ownerDashboard").hidden=true;$("#ownerLogin").hidden=false;$("#ownerPassword").value="";$("#ownerLoginMessage").textContent=""}
 
-$("#ownerLoginBtn").onclick=ownerLogin;
-$("#accountAvatar").onclick=()=>openAccount("login");
-$("#loginBtn").onclick=()=>openAccount("login");
-$("#signupBtn").onclick=()=>openAccount("signup");
-$("#accountLoginTab").onclick=()=>setAccountMode("login");
-$("#accountSignupTab").onclick=()=>setAccountMode("signup");
-$("#closeAccount").onclick=closeAccount;
-$("#accountForm").addEventListener("submit",handleAccountSubmit);
+const ownerLoginBtn=$("#ownerLoginBtn");if(ownerLoginBtn)ownerLoginBtn.onclick=ownerLogin;
+const accountAvatar=$("#accountAvatar");if(accountAvatar)accountAvatar.onclick=()=>openAccount("login");
+const loginBtn=$("#loginBtn");if(loginBtn)loginBtn.onclick=()=>openAccount("login");
+const signupBtn=$("#signupBtn");if(signupBtn)signupBtn.onclick=()=>openAccount("signup");
+const accountLoginTab=$("#accountLoginTab");if(accountLoginTab)accountLoginTab.onclick=()=>setAccountMode("login");
+const accountSignupTab=$("#accountSignupTab");if(accountSignupTab)accountSignupTab.onclick=()=>setAccountMode("signup");
+const closeAccountBtn=$("#closeAccount");if(closeAccountBtn)closeAccountBtn.onclick=closeAccount;
+const accountForm=$("#accountForm");if(accountForm)accountForm.addEventListener("submit",handleAccountSubmit);
 $("#ownerQuickBtn").onclick=openOwner;
 $("#closeOwner").onclick=closeOwner;
 $("#ownerRefresh").onclick=loadOwnerOrders;
